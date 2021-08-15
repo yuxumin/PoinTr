@@ -1,0 +1,15 @@
+argparse
+easydict
+h5py
+matplotlib
+numpy
+open3d==0.9
+opencv-python
+pyexr
+pyyaml
+scipy
+tensorboardX
+timm==0.4.5 
+tqdm
+torch>=1.7.0
+transforms3d

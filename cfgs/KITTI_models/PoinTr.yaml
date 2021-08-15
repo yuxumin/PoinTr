@@ -1,0 +1,30 @@
+optimizer : {
+  type: AdamW,
+  kwargs: {
+  lr : 0.0005,  # lr will be auto calcuated in main code
+  weight_decay : 0.0005
+}}
+scheduler: {
+  type: LambdaLR,
+  kwargs: {
+  decay_step: 21,
+  lr_decay: 0.9,
+  lowest_decay: 0.02  # min lr = lowest_decay * lr
+}}
+
+dataset : {
+  train : { _base_: cfgs/dataset_configs/PCNCars.yaml, 
+            others: {subset: 'train'}},
+  val : { _base_: cfgs/dataset_configs/PCNCars.yaml, 
+            others: {subset: 'test'}},
+  test : { _base_: cfgs/dataset_configs/KITTI.yaml, 
+            others: {subset: 'test'}}}
+
+model : {
+  NAME: PoinTr, num_pred: 14336, num_query: 224, knn_layer: 1, trans_dim: 384}
+total_bs : 48  # bs for single gpu will be auto calcuated in main code
+step_per_update : 1
+max_epoch : 5
+print_freq : 2
+
+consider_metric: CDL1

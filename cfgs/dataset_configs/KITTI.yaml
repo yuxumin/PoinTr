@@ -1,0 +1,5 @@
+NAME: KITTI
+CATEGORY_FILE_PATH: data/KITTI/KITTI.json
+N_POINTS: 16384
+CLOUD_PATH: data/KITTI/cars/%s.pcd
+BBOX_PATH: data/KITTI/bboxes/%s.txt

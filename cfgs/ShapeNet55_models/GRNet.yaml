@@ -1,0 +1,28 @@
+optimizer : {
+  type: Adam,
+  kwargs: {
+  lr : 0.0001,  # lr will be auto calcuated in main code
+  weight_decay : 0
+}}
+scheduler: {
+  type: StepLR,
+  kwargs: {
+  step_size: 50,
+  gamma : 0.5
+}}
+
+dataset : {
+  train : { _base_: cfgs/dataset_configs/ShapeNet-55.yaml, 
+            others: {subset: 'train'}},
+  val : { _base_: cfgs/dataset_configs/ShapeNet-55.yaml, 
+            others: {subset: 'test'}},
+  test : { _base_: cfgs/dataset_configs/ShapeNet-55.yaml, 
+            others: {subset: 'test'}}}
+model : {
+  NAME: GRNet, num_pred: 16384, gridding_loss_scales: 128, gridding_loss_alphas: 0.1}
+total_bs : 32  # bs for single gpu will be auto calcuated in main code
+step_per_update : 1
+max_epoch : 150
+print_freq : 20
+
+consider_metric: CDL2
