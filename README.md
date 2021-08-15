@@ -72,8 +72,6 @@ bash ./scipt/test.sh 0 --ckpts ./pretrained/PoinTr_KITTI.pth --config ./cfgs/KIT
 
 ### Training
 
-#### ShapeNet55/34 and PCN
-
 To train PointCompletion models from scratch, run:
 
 ```
