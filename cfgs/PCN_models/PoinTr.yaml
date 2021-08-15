@@ -4,6 +4,7 @@ optimizer : {
   lr : 0.0005,  # lr will be auto calcuated in main code
   weight_decay : 0.0005
 }}
+
 scheduler: {
   type: LambdaLR,
   kwargs: {

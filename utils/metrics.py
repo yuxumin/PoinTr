@@ -55,19 +55,29 @@ class Metrics(object):
 
     @classmethod
     def _get_f_score(cls, pred, gt, th=0.01):
+
         """References: https://github.com/lmb-freiburg/what3d/blob/master/util.py"""
-        pred = cls._get_open3d_ptcloud(pred)
-        gt = cls._get_open3d_ptcloud(gt)
+        b = pred.size(0)
+        assert pred.size(0) == gt.size(0)
+        if b != 1:
+            f_score_list = []
+            for idx in range(b):
+                f_score_list.append(cls._get_f_score(pred[idx:idx+1], gt[idx:idx+1]))
+            return sum(f_score_list)/len(f_score_list)
+        else:
+            pred = cls._get_open3d_ptcloud(pred)
+            gt = cls._get_open3d_ptcloud(gt)
 
-        dist1 = pred.compute_point_cloud_distance(gt)
-        dist2 = gt.compute_point_cloud_distance(pred)
+            dist1 = pred.compute_point_cloud_distance(gt)
+            dist2 = gt.compute_point_cloud_distance(pred)
 
-        recall = float(sum(d < th for d in dist2)) / float(len(dist2))
-        precision = float(sum(d < th for d in dist1)) / float(len(dist1))
-        return 2 * recall * precision / (recall + precision) if recall + precision else 0
+            recall = float(sum(d < th for d in dist2)) / float(len(dist2))
+            precision = float(sum(d < th for d in dist1)) / float(len(dist1))
+            return 2 * recall * precision / (recall + precision) if recall + precision else 0
 
     @classmethod
     def _get_open3d_ptcloud(cls, tensor):
+        """pred and gt bs is 1"""
         tensor = tensor.squeeze().cpu().numpy()
         ptcloud = open3d.geometry.PointCloud()
         ptcloud.points = open3d.utility.Vector3dVector(tensor)

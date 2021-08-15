@@ -29,8 +29,8 @@ def run_net(args, config, train_writer=None, val_writer=None):
     if args.resume:
         start_epoch, best_metrics = builder.resume_model(base_model, args, logger = logger)
         best_metrics = Metrics(config.consider_metric, best_metrics)
-    elif args.startckpts is not None:
-        builder.load_model(base_model, args.startckpts, logger = logger)
+    elif args.start_ckpts is not None:
+        builder.load_model(base_model, args.start_ckpts, logger = logger)
 
     # DDP
     if args.distributed:
@@ -188,10 +188,10 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
 
             test_losses.update([sparse_loss_l1.item() * 1000, sparse_loss_l2.item() * 1000, dense_loss_l1.item() * 1000, dense_loss_l2.item() * 1000])
 
-            dense_points = dist_utils.gather_tensor(dense_points, args)
-            gt = dist_utils.gather_tensor(gt, args)
+            dense_points_all = dist_utils.gather_tensor(dense_points, args)
+            gt_all = dist_utils.gather_tensor(gt, args)
 
-            _metrics = Metrics.get(dense_points, gt)
+            _metrics = Metrics.get(dense_points_all, gt_all)
             test_metrics.update(_metrics)
 
             if taxonomy_id not in category_metrics:
