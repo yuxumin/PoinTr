@@ -54,15 +54,20 @@ pip install --upgrade https://github.com/unlimblue/KNN_CUDA/releases/download/0.
 To evaluate a pre-trained PoinTr model on the Three Dataset with single GPU, run:
 
 ```
-# bash ./scipt/test.sh <GPU_IDS> --ckpts <path> --config <config> --exp_name <name>
-
-# for example:
-# Test PoinTr pretrained ckpt on PCN benchmark
-bash ./scipt/test.sh 0 --ckpts ./pretrained/PoinTr_PCN.pth --config ./cfgs/PCN_models/PoinTr.yaml --exp_name PoinTr_PCN
-# Test PoinTr pretrained ckpt on ShapeNet55 benchmark under easy mode
-bash ./scipt/test.sh 0 --ckpts ./pretrained/PoinTr_ShapeNet55.pth --config ./cfgs/ShapeNet55_models/PoinTr.yaml --mode easy --exp_name PoinTr_ShapeNet55
-# Test PoinTr pretrained ckpt on KITTI benchmark
-bash ./scipt/test.sh 0 --ckpts ./pretrained/PoinTr_KITTI.pth --config ./cfgs/KITTI_models/PoinTr.yaml --exp_name PoinTr_KITTI
+# bash ./scipt/test.sh <GPU_IDS> --ckpts <path> --config <config> --exp_name <name> [--mode <easy/median/hard>]
+```
+#### for example:
+Test PoinTr pretrained ckpt on PCN benchmark
+```
+bash ./scipt/test.sh 0 --ckpts ./pretrained/PoinTr_PCN.pth --config ./cfgs/PCN_models/PoinTr.yaml --exp_name example
+```
+Test PoinTr pretrained ckpt on ShapeNet55 benchmark under easy mode
+```
+bash ./scipt/test.sh 0 --ckpts ./pretrained/PoinTr_ShapeNet55.pth --config ./cfgs/ShapeNet55_models/PoinTr.yaml --mode easy --exp_name example
+```
+Test PoinTr pretrained ckpt on KITTI benchmark
+```
+bash ./scipt/test.sh 0 --ckpts ./pretrained/PoinTr_KITTI.pth --config ./cfgs/KITTI_models/PoinTr.yaml --exp_name example
 ```
 
 ### Training
@@ -74,17 +79,27 @@ To train PointCompletion models from scratch, run:
 ```
 # Using DDP
 # bash ./scipt/dist_train.sh <NUM_GPU> <port> --config <config> --exp_name <name> [--resume] [--start_ckpts <path>]
-# for example:
-# Train a PoinTr model on PCN benchmark with 0,1 gpus
+```
+####  for example:
+Train a PoinTr model on PCN benchmark with 0,1 gpus
+```
 CUDA_VISIBLE_DEVICES=0,1 bash ./scripts/dist_train.sh 2 13232 --config ./cfgs/PCN_models/PoinTr.yaml --exp_name example
-# Autoresume the ckpts
+```
+Autoresume the ckpts
+```
 CUDA_VISIBLE_DEVICES=0,1 bash ./scripts/dist_train.sh 2 13232 --config ./cfgs/PCN_models/PoinTr.yaml --exp_name example --resume
-# Train a GRNet on ShapeNet-55
+```
+Train a GRNet on ShapeNet-55
+```
 CUDA_VISIBLE_DEVICES=0,1 bash ./scripts/dist_train.sh 2 13232 --config ./cfgs/ShapeNet55_models/GRNet.yaml --exp_name example
-# Finetune a PoinTr on PCNCars
+```
+Finetune a PoinTr on PCNCars
+```
 CUDA_VISIBLE_DEVICES=0,1 bash ./scripts/dist_train.sh 2 13232 --config ./cfgs/KITTI_models/PoinTr.yaml --exp_name example --start_ckpts ./weight.pth
+```
 
-# single GPU
+single GPU
+```
 bash ./scripts/train.sh 0 --config ./cfgs/KITTI_models/PoinTr.yaml --exp_name example
 ```
 
