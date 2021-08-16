@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-
+import json
 from tools import builder
 from utils import misc, dist_utils
 import time
@@ -91,15 +91,13 @@ def run_net(args, config, train_writer=None, val_writer=None):
                 sparse_loss, dense_loss = base_model.module.get_loss(ret, gt)
             else:
                 sparse_loss, dense_loss = base_model.get_loss(ret, gt)
-
-            sparse_loss = dist_utils.reduce_tensor(sparse_loss, args)
-            dense_loss = dist_utils.reduce_tensor(dense_loss, args)
-        
-            
+         
             _loss = sparse_loss + dense_loss 
-            losses.update([sparse_loss.item() * 1000, dense_loss.item() * 1000])
-            
             _loss.backward()
+
+            sparse_loss_print = dist_utils.reduce_tensor(sparse_loss, args)
+            dense_loss_print = dist_utils.reduce_tensor(dense_loss, args)
+            losses.update([sparse_loss_print.item() * 1000, dense_loss_print.item() * 1000])
 
             # forward
             if num_iter == config.step_per_update:
@@ -109,8 +107,8 @@ def run_net(args, config, train_writer=None, val_writer=None):
 
             n_itr = epoch * n_batches + idx
             if train_writer is not None:
-                train_writer.add_scalar('Loss/Batch/Sparse', sparse_loss.item() * 1000, n_itr)
-                train_writer.add_scalar('Loss/Batch/Dense', dense_loss.item() * 1000, n_itr)
+                train_writer.add_scalar('Loss/Batch/Sparse', sparse_loss_print.item() * 1000, n_itr)
+                train_writer.add_scalar('Loss/Batch/Dense', dense_loss_print.item() * 1000, n_itr)
 
             batch_time.update(time.time() - batch_start_time)
             batch_start_time = time.time()
@@ -144,7 +142,6 @@ def run_net(args, config, train_writer=None, val_writer=None):
             builder.save_checkpoint(base_model, optimizer, epoch, metrics, best_metrics, f'ckpt-epoch-{epoch:03d}', args, logger = logger)     
     train_writer.close()
     val_writer.close()
-
 
 def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val_writer, args, config, logger = None):
     print_log(f"[VALIDATION] Start validating epoch {epoch}", logger = logger)
@@ -192,6 +189,7 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
             gt_all = dist_utils.gather_tensor(gt, args)
 
             _metrics = Metrics.get(dense_points_all, gt_all)
+            # _metrics = Metrics.get(dense_points, gt)
             test_metrics.update(_metrics)
 
             if taxonomy_id not in category_metrics:
@@ -224,26 +222,26 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
         if args.distributed:
             torch.cuda.synchronize()
      
-
-    # Print testing results
-    print('============================ TEST RESULTS ============================')
-    print('Taxonomy', end='\t')
-    print('#Sample', end='\t')
-    for metric in test_metrics.items:
-        print(metric, end='\t')
-    print()
-
-    for taxonomy_id in category_metrics:
-        print(taxonomy_id, end='\t')
-        print(category_metrics[taxonomy_id].count(0), end='\t')
-        for value in category_metrics[taxonomy_id].avg():
-            print('%.4f' % value, end='\t')
+    if args.local_rank==0:
+        # Print testing results
+        print('============================ TEST RESULTS ============================')
+        print('Taxonomy', end='\t')
+        print('#Sample', end='\t')
+        for metric in test_metrics.items:
+            print(metric, end='\t')
         print()
 
-    print('Overall', end='\t\t\t')
-    for value in test_metrics.avg():
-        print('%.4f' % value, end='\t')
-    print('\n')
+        for taxonomy_id in category_metrics:
+            print(taxonomy_id, end='\t')
+            print(category_metrics[taxonomy_id].count(0), end='\t')
+            for value in category_metrics[taxonomy_id].avg():
+                print('%.4f' % value, end='\t')
+            print()
+
+        print('Overall', end='\t\t\t')
+        for value in test_metrics.avg():
+            print('%.4f' % value, end='\t')
+        print('\n')
 
     # Add testing results to TensorBoard
     if val_writer is not None:
@@ -331,7 +329,8 @@ def test(base_model, test_dataloader, ChamferDisL1, ChamferDisL2, args, config, 
                 num_crop = int(npoints * crop_ratio[args.mode])
                 for item in choice:           
                     partial, _ = misc.seprate_point_cloud(gt, npoints, num_crop, fixed_points = item)
-                    partial = partial.cuda()
+                    # NOTE: subsample the input
+                    partial = misc.fps(partial, 2048)
                     ret = base_model(partial)
                     coarse_points = ret[0]
                     dense_points = ret[1]
@@ -377,6 +376,7 @@ def test(base_model, test_dataloader, ChamferDisL1, ChamferDisL2, args, config, 
      
 
     # Print testing results
+    shapenet_dict = json.load(open('./data/shapenet_synset_dict.json', 'r'))
     print('============================ TEST RESULTS ============================')
     print('Taxonomy', end='\t')
     print('#Sample', end='\t')
@@ -385,7 +385,7 @@ def test(base_model, test_dataloader, ChamferDisL1, ChamferDisL2, args, config, 
     print()
 
     for taxonomy_id in category_metrics:
-        print(taxonomy_id, end='\t')
+        print(shapenet_dict[taxonomy_id], end='\t')
         print(category_metrics[taxonomy_id].count(0), end='\t')
         for value in category_metrics[taxonomy_id].avg():
             print('%.4f' % value, end='\t')
