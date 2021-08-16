@@ -181,5 +181,5 @@ class GRNet(torch.nn.Module):
         dense_cloud = sparse_cloud.unsqueeze(dim=2).repeat(1, 1, 8, 1).reshape(-1,self.num_pred,3) + point_offset
 
         ret = (sparse_cloud * 2.0, dense_cloud * 2.0)
-
+        # ret = (sparse_cloud, dense_cloud)
         return ret
