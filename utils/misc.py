@@ -222,7 +222,7 @@ def visualize_KITTI(path, data_list, titles = ['input','pred'], cmap=['bwr','aut
         ax.set_ylim(ylim)
         ax.set_zlim(zlim)
     plt.subplots_adjust(left=0, right=1, bottom=0, top=1, wspace=0.2, hspace=0)
-    if os.path.exists(path):
+    if not os.path.exists(path):
         os.makedirs(path)
 
     pic_path = path + '.png'
@@ -232,3 +232,10 @@ def visualize_KITTI(path, data_list, titles = ['input','pred'], cmap=['bwr','aut
     np.save(os.path.join(path, 'pred.npy'), data_list[1].numpy())
     plt.close(fig)
 
+
+def random_padding(pc):
+    pc = pc
+    random_num = torch.randint(1, 512, (1,1))[0,0]
+    pc = fps(pc, random_num)
+    padding = torch.zeros(pc.size(0), 2048 - pc.size(1), 3).cuda()
+    return torch.cat([pc,padding], dim=1)

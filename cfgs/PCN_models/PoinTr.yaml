@@ -1,7 +1,7 @@
 optimizer : {
   type: AdamW,
   kwargs: {
-  lr : 0.0005,  # lr will be auto calcuated in main code
+  lr : 0.0005, 
   weight_decay : 0.0005
 }}
 
@@ -32,7 +32,7 @@ dataset : {
 model : {
   NAME: PoinTr, num_pred: 14336, num_query: 224, knn_layer: 1, trans_dim: 384}
   
-total_bs : 48  # bs for single gpu will be auto calcuated in main code
+total_bs : 48 
 step_per_update : 1
 max_epoch : 300
 

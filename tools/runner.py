@@ -77,6 +77,8 @@ def run_net(args, config, train_writer=None, val_writer=None):
             dataset_name = config.dataset.train._base_.NAME
             if dataset_name == 'PCN':
                 partial = data[0].cuda()
+                if config.dataset.train._base_.CARS:
+                    partial = misc.random_padding(partial) # specially for KITTI finetune
                 gt = data[1].cuda()
             elif dataset_name == 'ShapeNet':
                 gt = data.cuda()
@@ -186,12 +188,12 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
 
             test_losses.update([sparse_loss_l1.item() * 1000, sparse_loss_l2.item() * 1000, dense_loss_l1.item() * 1000, dense_loss_l2.item() * 1000])
 
-            dense_points_all = dist_utils.gather_tensor(dense_points, args)
-            gt_all = dist_utils.gather_tensor(gt, args)
+            # dense_points_all = dist_utils.gather_tensor(dense_points, args)
+            # gt_all = dist_utils.gather_tensor(gt, args)
 
-            _metrics = Metrics.get(dense_points_all, gt_all)
-            # _metrics = Metrics.get(dense_points, gt)
-            test_metrics.update(_metrics)
+            # _metrics = Metrics.get(dense_points_all, gt_all)
+            _metrics = Metrics.get(dense_points, gt)
+            # _metrics = [dist_utils.reduce_tensor(item, args) for item in _metrics]
 
             if taxonomy_id not in category_metrics:
                 category_metrics[taxonomy_id] = AverageMeter(Metrics.names())
@@ -218,31 +220,32 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
                 print_log('Test[%d/%d] Taxonomy = %s Sample = %s Losses = %s Metrics = %s' %
                             (idx + 1, n_samples, taxonomy_id, model_id, ['%.4f' % l for l in test_losses.val()], 
                             ['%.4f' % m for m in _metrics]), logger=logger)
+        for _,v in category_metrics.items():
+            test_metrics.update(v.avg())
         print_log('[Validation] EPOCH: %d  Metrics = %s' % (epoch, ['%.4f' % m for m in test_metrics.avg()]), logger=logger)
 
         if args.distributed:
             torch.cuda.synchronize()
      
-    if args.local_rank==0:
-        # Print testing results
-        print('============================ TEST RESULTS ============================')
-        print('Taxonomy', end='\t')
-        print('#Sample', end='\t')
-        for metric in test_metrics.items:
-            print(metric, end='\t')
+    # Print testing results
+    print('============================ TEST RESULTS ============================')
+    print('Taxonomy', end='\t')
+    print('#Sample', end='\t')
+    for metric in test_metrics.items:
+        print(metric, end='\t')
+    print()
+
+    for taxonomy_id in category_metrics:
+        print(taxonomy_id, end='\t')
+        print(category_metrics[taxonomy_id].count(0), end='\t')
+        for value in category_metrics[taxonomy_id].avg():
+            print('%.4f' % value, end='\t')
         print()
 
-        for taxonomy_id in category_metrics:
-            print(taxonomy_id, end='\t')
-            print(category_metrics[taxonomy_id].count(0), end='\t')
-            for value in category_metrics[taxonomy_id].avg():
-                print('%.4f' % value, end='\t')
-            print()
-
-        print('Overall', end='\t\t\t')
-        for value in test_metrics.avg():
-            print('%.4f' % value, end='\t')
-        print('\n')
+    print('Overall', end='\t\t\t')
+    for value in test_metrics.avg():
+        print('%.4f' % value, end='\t')
+    print('\n')
 
     # Add testing results to TensorBoard
     if val_writer is not None:
@@ -354,15 +357,16 @@ def test(base_model, test_dataloader, ChamferDisL1, ChamferDisL2, args, config, 
                 partial = data.cuda()
                 ret = base_model(partial)
                 dense_points = ret[1]
-
+                target_path = os.path.join(args.experiment_path, 'vis_result')
+                if not os.path.exists(target_path):
+                    os.mkdir(target_path)
                 misc.visualize_KITTI(
-                    os.path.join(args.experiment_path, 'vis_result', f'{model_id}_{idx:03d}'),
+                    os.path.join(target_path, f'{model_id}_{idx:03d}'),
                     [partial[0].cpu(), dense_points[0].cpu()]
                 )
                 continue
             else:
                 raise NotImplementedError(f'Train phase do not support {dataset_name}')
-
 
             if (idx+1) % 20 == 0:
                 print_log('Test[%d/%d] Taxonomy = %s Sample = %s Losses = %s Metrics = %s' %

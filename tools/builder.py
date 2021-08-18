@@ -126,5 +126,5 @@ def load_model(base_model, ckpt_path, logger = None):
         metrics = state_dict['metrics']
     else:
         metrics = 'No Metrics'
-    print_log(f'ckpts @ {epoch} epoch( performance = {metrics:s})', logger = logger)
+    print_log(f'ckpts @ {epoch} epoch( performance = {str(metrics):s})', logger = logger)
     return 

@@ -42,7 +42,7 @@ class KITTI(data.Dataset):
                 'callback': 'ToTensor',
                 'objects': ['partial_cloud', 'bounding_box']
             }])
-        self.file_list = self._get_file_list(subset)
+        self.file_list = self._get_file_list(self.subset)
 
     def _get_file_list(self, subset):
         """Prepare file list for the dataset"""
