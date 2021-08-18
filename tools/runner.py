@@ -381,17 +381,19 @@ def test(base_model, test_dataloader, ChamferDisL1, ChamferDisL2, args, config, 
     # Print testing results
     shapenet_dict = json.load(open('./data/shapenet_synset_dict.json', 'r'))
     print('============================ TEST RESULTS ============================')
-    print('Taxonomy', end='\t\t\t')
+    print('Taxonomy', end='\t')
     print('#Sample', end='\t')
     for metric in test_metrics.items:
         print(metric, end='\t')
+    print('#ModelName', end='\t')
     print()
 
     for taxonomy_id in category_metrics:
-        print(shapenet_dict[taxonomy_id], end='\t\t\t')
+        print(taxonomy_id, end='\t')
         print(category_metrics[taxonomy_id].count(0), end='\t')
         for value in category_metrics[taxonomy_id].avg():
             print('%.4f' % value, end='\t')
+        print(shapenet_dict[taxonomy_id], end='\t')
         print()
 
     print('Overall', end='\t\t\t')
