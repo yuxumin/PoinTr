@@ -344,7 +344,8 @@ def test(base_model, test_dataloader, ChamferDisL1, ChamferDisL2, args, config, 
                     test_losses.update([sparse_loss_l1.item() * 1000, sparse_loss_l2.item() * 1000, dense_loss_l1.item() * 1000, dense_loss_l2.item() * 1000])
 
                     _metrics = Metrics.get(dense_points ,gt)
-                    test_metrics.update(_metrics)
+
+                    # test_metrics.update(_metrics)
 
                     if taxonomy_id not in category_metrics:
                         category_metrics[taxonomy_id] = AverageMeter(Metrics.names())
@@ -371,7 +372,8 @@ def test(base_model, test_dataloader, ChamferDisL1, ChamferDisL2, args, config, 
             torch.cuda.synchronize()
         if dataset_name == 'KITTI':
             return
-
+        for _,v in category_metrics.items():
+            test_metrics.update(v.avg())
         print_log('[TEST] Metrics = %s' % (['%.4f' % m for m in test_metrics.avg()]), logger=logger)
 
      
@@ -379,14 +381,14 @@ def test(base_model, test_dataloader, ChamferDisL1, ChamferDisL2, args, config, 
     # Print testing results
     shapenet_dict = json.load(open('./data/shapenet_synset_dict.json', 'r'))
     print('============================ TEST RESULTS ============================')
-    print('Taxonomy', end='\t')
+    print('Taxonomy', end='\t\t\t')
     print('#Sample', end='\t')
     for metric in test_metrics.items:
         print(metric, end='\t')
     print()
 
     for taxonomy_id in category_metrics:
-        print(shapenet_dict[taxonomy_id], end='\t')
+        print(shapenet_dict[taxonomy_id], end='\t\t\t')
         print(category_metrics[taxonomy_id].count(0), end='\t')
         for value in category_metrics[taxonomy_id].avg():
             print('%.4f' % value, end='\t')
