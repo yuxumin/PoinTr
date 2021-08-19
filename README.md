@@ -35,21 +35,20 @@ We provide pretrained PoinTr models:
 pip install -r requirements.txt
 ```
 
-#### Build Pytorch extension (chamfer distance and others)
+#### Building Pytorch Extensions for Chamfer Distance, PointNet++ and kNN
 
 *NOTE:* PyTorch >= 1.7 and GCC >= 4.9 are required.
 
 ```
+# Chamfer Distance
 bash install.sh
-```
-
-#### Building C++/CUDA Extensions for PointNet++ and kNN
-```
+# PointNet++
 pip install "git+git://github.com/erikwijmans/Pointnet2_PyTorch.git#egg=pointnet2_ops&subdirectory=pointnet2_ops_lib"
+# GPU kNN
 pip install --upgrade https://github.com/unlimblue/KNN_CUDA/releases/download/0.2/KNN_CUDA-0.2-py3-none-any.whl
 ```
 
-### Prepare Dataset
+### Dataset
 
 The details of our new ***ShapeNet-55/34*** datasets and other existing datasets can be found in [DATASET.md](./DATASET.md).
 
