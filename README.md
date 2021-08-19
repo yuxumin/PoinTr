@@ -57,20 +57,20 @@ pip install --upgrade https://github.com/unlimblue/KNN_CUDA/releases/download/0.
 To evaluate a pre-trained PoinTr model on the Three Dataset with single GPU, run:
 
 ```
-# bash ./scipt/test.sh <GPU_IDS> --ckpts <path> --config <config> --exp_name <name> [--mode <easy/median/hard>]
+# bash ./scripts/test.sh <GPU_IDS> --ckpts <path> --config <config> --exp_name <name> [--mode <easy/median/hard>]
 ```
 #### for example:
 Test PoinTr pretrained ckpt on PCN benchmark
 ```
-bash ./scipt/test.sh 0 --ckpts ./pretrained/PoinTr_PCN.pth --config ./cfgs/PCN_models/PoinTr.yaml --exp_name example
+bash ./scripts/test.sh 0 --ckpts ./pretrained/PoinTr_PCN.pth --config ./cfgs/PCN_models/PoinTr.yaml --exp_name example
 ```
 Test PoinTr pretrained ckpt on ShapeNet55 benchmark under easy mode
 ```
-bash ./scipt/test.sh 0 --ckpts ./pretrained/PoinTr_ShapeNet55.pth --config ./cfgs/ShapeNet55_models/PoinTr.yaml --mode easy --exp_name example
+bash ./scripts/test.sh 0 --ckpts ./pretrained/PoinTr_ShapeNet55.pth --config ./cfgs/ShapeNet55_models/PoinTr.yaml --mode easy --exp_name example
 ```
 Test PoinTr pretrained ckpt on KITTI benchmark
 ```
-bash ./scipt/test.sh 0 --ckpts ./pretrained/PoinTr_KITTI.pth --config ./cfgs/KITTI_models/PoinTr.yaml --exp_name example
+bash ./scripts/test.sh 0 --ckpts ./pretrained/PoinTr_KITTI.pth --config ./cfgs/KITTI_models/PoinTr.yaml --exp_name example
 ```
 
 ### Training
@@ -79,9 +79,9 @@ To train PointCompletion models from scratch, run:
 
 ```
 # Using DDP
-# bash ./scipt/dist_train.sh <NUM_GPU> <port> --config <config> --exp_name <name> [--resume] [--start_ckpts <path>] [--val_freq <int>]
+# bash ./scripts/dist_train.sh <NUM_GPU> <port> --config <config> --exp_name <name> [--resume] [--start_ckpts <path>] [--val_freq <int>]
 # or just using DP
-# bash ./scipt/train.sh <GPUIDS> --config <config> --exp_name <name> [--resume] [--start_ckpts <path>] [--val_freq <int>]
+# bash ./scripts/train.sh <GPUIDS> --config <config> --exp_name <name> [--resume] [--start_ckpts <path>] [--val_freq <int>]
 ```
 ####  for example:
 Train a PoinTr model on PCN benchmark with 0,1 gpus

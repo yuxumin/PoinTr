@@ -252,14 +252,14 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
         msg += (taxonomy_id + '\t')
         msg += (str(category_metrics[taxonomy_id].count(0)) + '\t')
         for value in category_metrics[taxonomy_id].avg():
-            msg += '%.4f \t' % value
+            msg += '%.3f \t' % value
         msg += shapenet_dict[taxonomy_id] + '\t'
         print_log(msg, logger=logger)
 
     msg = ''
     msg += 'Overall\t\t'
     for value in test_metrics.avg():
-        msg += '%.4f \t' % value
+        msg += '%.3f \t' % value
     print_log(msg, logger=logger)
 
     # Add testing results to TensorBoard
@@ -379,7 +379,7 @@ def test(base_model, test_dataloader, ChamferDisL1, ChamferDisL2, args, config, 
             else:
                 raise NotImplementedError(f'Train phase do not support {dataset_name}')
 
-            if (idx+1) % 20 == 0:
+            if (idx+1) % 200 == 0:
                 print_log('Test[%d/%d] Taxonomy = %s Sample = %s Losses = %s Metrics = %s' %
                             (idx + 1, n_samples, taxonomy_id, model_id, ['%.4f' % l for l in test_losses.val()], 
                             ['%.4f' % m for m in _metrics]), logger=logger)
@@ -408,13 +408,13 @@ def test(base_model, test_dataloader, ChamferDisL1, ChamferDisL2, args, config, 
         msg += (taxonomy_id + '\t')
         msg += (str(category_metrics[taxonomy_id].count(0)) + '\t')
         for value in category_metrics[taxonomy_id].avg():
-            msg += '%.4f \t' % value
+            msg += '%.3f \t' % value
         msg += shapenet_dict[taxonomy_id] + '\t'
         print_log(msg, logger=logger)
 
     msg = ''
     msg += 'Overall \t\t'
     for value in test_metrics.avg():
-        msg += '%.4f \t' % value
+        msg += '%.3f \t' % value
     print_log(msg, logger=logger)
     return 

@@ -78,6 +78,8 @@ def resume_model(base_model, args, logger = None):
     # parameter
     start_epoch = state_dict['epoch'] + 1
     best_metrics = state_dict['best_metrics']
+    if not isinstance(best_metrics, dict):
+        best_metrics = best_metrics.state_dict()
     # print(best_metrics)
 
     print_log(f'[RESUME INFO] resume ckpts @ {start_epoch - 1} epoch( best_metrics = {str(best_metrics):s})', logger = logger)
@@ -126,6 +128,8 @@ def load_model(base_model, ckpt_path, logger = None):
         epoch = state_dict['epoch']
     if state_dict.get('metrics') is not None:
         metrics = state_dict['metrics']
+        if not isinstance(metrics, dict):
+            metrics = metrics.state_dict()
     else:
         metrics = 'No Metrics'
     print_log(f'ckpts @ {epoch} epoch( performance = {str(metrics):s})', logger = logger)
