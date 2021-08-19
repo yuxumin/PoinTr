@@ -1,6 +1,14 @@
-## DATASET 
+## Dataset 
 
-Overall directory structure should be:
+### ShapNet55/34
+
+We propose two more challenging benchmarks ShapeNet-55 and ShapeNet-34 with more diverse incomplete point clouds that can better reflect the real-world scenarios to promote future research. Our dataset is based on [ShapeNetCore](https://shapenet.org/). Compared to existing datasets like PCN, ShapeNet-55 considers more diverse tasks (i.e., upsampling and completion of point cloud), more diverse categories (i.e., from 8 categories to 55 categories), more diverse viewpoints (i.e., from 8 viewpoints to all possible viewpoints) and more diverse levels of incompleteness (i.e., missing 25% to 75% points of the groundtruth point clouds). We also propose to benchmark the completion perfomance on objects from unseen categories with ShapeNet-34.  
+
+![dataset](fig/dataset.png)
+
+
+### Data Preparation
+The overall directory structure should be:
 
 ```
 │PoinTr/
@@ -12,7 +20,7 @@ Overall directory structure should be:
 │   ├──KITTI/
 ├──.......
 ```
-**ShapeNet55/34 Dataset**: You can download the processed ShapeNet55/34 dataset [[BaiduCloud](https://pan.baidu.com/s/16Q-GsEXEHkXRhmcSZTY86A)] (code:le04) [[Google Drive](https://drive.google.com/file/d/1jUB5yD7DP97-EqqU2A9mmr61JpNwZBVK/view?usp=sharing)]. Unzip the file under `ShapeNet55-34/` The directory structure should be
+**ShapeNet55/34 Dataset**: You can download the processed ShapeNet55/34 dataset at [[BaiduCloud](https://pan.baidu.com/s/16Q-GsEXEHkXRhmcSZTY86A)] (code:le04) or [[Google Drive](https://drive.google.com/file/d/1jUB5yD7DP97-EqqU2A9mmr61JpNwZBVK/view?usp=sharing)]. Unzip the file under `ShapeNet55-34/`. The directory structure should be
 
 ```
 │ShapeNet55-34/
@@ -30,7 +38,7 @@ Overall directory structure should be:
    └── test.txt
 ```
 
-**PCN Dataset**: You can download the processed ShapeNet dataset [here](https://gateway.infinitescript.com/?fileName=ShapeNetCompletion). The directory structure should be
+**PCN Dataset**: You can download the processed PCN dataset from this [url](https://gateway.infinitescript.com/?fileName=ShapeNetCompletion). The directory structure should be
 
 ```
 │PCN/
@@ -77,7 +85,7 @@ Overall directory structure should be:
 └──category.txt
 ```
 
-**KITTI**: You can download the KITTI dataset [here](https://drive.google.com/drive/folders/1fSu0_huWhticAlzLh3Ejpg8zxzqO1z-F). The directory structure should be
+**KITTI**: You can download the KITTI dataset from this [url](https://drive.google.com/drive/folders/1fSu0_huWhticAlzLh3Ejpg8zxzqO1z-F). The directory structure should be
 
 ```
 │KITTI/
