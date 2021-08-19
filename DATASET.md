@@ -1,4 +1,4 @@
-## DATASET 
+## Dataset 
 
 ### ShapNet55/34
 
@@ -38,7 +38,7 @@ The overall directory structure should be:
    └── test.txt
 ```
 
-**PCN Dataset**: You can download the processed PCN dataset [here](https://gateway.infinitescript.com/?fileName=ShapeNetCompletion). The directory structure should be
+**PCN Dataset**: You can download the processed PCN dataset from this [url](https://gateway.infinitescript.com/?fileName=ShapeNetCompletion). The directory structure should be
 
 ```
 │PCN/
@@ -85,7 +85,7 @@ The overall directory structure should be:
 └──category.txt
 ```
 
-**KITTI**: You can download the KITTI dataset [here](https://drive.google.com/drive/folders/1fSu0_huWhticAlzLh3Ejpg8zxzqO1z-F). The directory structure should be
+**KITTI**: You can download the KITTI dataset from this [url](https://drive.google.com/drive/folders/1fSu0_huWhticAlzLh3Ejpg8zxzqO1z-F). The directory structure should be
 
 ```
 │KITTI/
