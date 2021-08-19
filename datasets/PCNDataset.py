@@ -24,6 +24,7 @@ class PCN(data.Dataset):
         self.category_file = config.CATEGORY_FILE_PATH
         self.npoints = config.N_POINTS
         self.subset = config.subset
+        self.cars = config.CARS
 
         # Load the dataset indexing file
         self.dataset_categories = []
@@ -92,7 +93,8 @@ class PCN(data.Dataset):
         sample = self.file_list[idx]
         data = {}
         rand_idx = -1
-        # rand_idx = random.randint(0, self.n_renderings - 1) if self.subset=='train' else 0
+        if self.cars:
+            rand_idx = random.randint(0, self.n_renderings - 1) if self.subset=='train' else 0
 
         for ri in ['partial', 'gt']:
             file_path = sample['%s_path' % ri]
@@ -104,6 +106,12 @@ class PCN(data.Dataset):
 
         if self.transforms is not None:
             data = self.transforms(data)
+        
+        if self.cars:
+            # to mimic the kitti data distribution
+            data['partial'] = data['partial'] * 1.1
+            data['gt'] = data['gt'] * 1.1
+
         return sample['taxonomy_id'], sample['model_id'], (data['partial'], data['gt'])
 
     def __len__(self):
