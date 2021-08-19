@@ -17,12 +17,14 @@ def dataset_builder(args, config):
         sampler = torch.utils.data.distributed.DistributedSampler(dataset, shuffle = shuffle)
         dataloader = torch.utils.data.DataLoader(dataset, batch_size = config.others.bs if shuffle else 1,
                                             num_workers = int(args.num_workers),
+                                            drop_last = config.others.subset == 'train',
                                             worker_init_fn = worker_init_fn,
                                             sampler = sampler)
     else:
         sampler = None
         dataloader = torch.utils.data.DataLoader(dataset, batch_size=config.others.bs if shuffle else 1,
                                                 shuffle = shuffle, 
+                                                drop_last = config.others.subset == 'train',
                                                 num_workers = int(args.num_workers),
                                                 worker_init_fn=worker_init_fn)
     return sampler, dataloader
@@ -78,7 +80,7 @@ def resume_model(base_model, args, logger = None):
     best_metrics = state_dict['best_metrics']
     # print(best_metrics)
 
-    print_log(f'[RESUME INFO] resume ckpts @ {start_epoch - 1} epoch( best_metrics = {best_metrics:s})', logger = logger)
+    print_log(f'[RESUME INFO] resume ckpts @ {start_epoch - 1} epoch( best_metrics = {str(best_metrics):s})', logger = logger)
     return start_epoch, best_metrics
 
 def resume_optimizer(optimizer, args, logger = None):
@@ -98,8 +100,8 @@ def save_checkpoint(base_model, optimizer, epoch, metrics, best_metrics, prefix,
                     'base_model' : base_model.module.state_dict() if args.distributed else base_model.state_dict(),
                     'optimizer' : optimizer.state_dict(),
                     'epoch' : epoch,
-                    'metrics' : metrics.state_dict(),
-                    'best_metrics' : best_metrics,
+                    'metrics' : metrics.state_dict() if metrics is not None else dict(),
+                    'best_metrics' : best_metrics.state_dict() if best_metrics is not None else dict(),
                     }, os.path.join(args.experiment_path, prefix + '.pth'))
         print_log(f"Save checkpoint at {os.path.join(args.experiment_path, prefix + '.pth')}", logger = logger)
 

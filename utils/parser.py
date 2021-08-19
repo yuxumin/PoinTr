@@ -31,6 +31,7 @@ def get_args():
     parser.add_argument('--exp_name', type = str, default='default', help = 'experiment name')
     parser.add_argument('--start_ckpts', type = str, default=None, help = 'reload used ckpt path')
     parser.add_argument('--ckpts', type = str, default=None, help = 'test used ckpt path')
+    parser.add_argument('--val_freq', type = int, default=5, help = 'test freq')
     parser.add_argument(
         '--resume', 
         action='store_true', 
@@ -52,9 +53,9 @@ def get_args():
         raise ValueError(
             '--test and --resume cannot be both activate')
 
-    if args.resume and args.startckpts is not None:
+    if args.resume and args.start_ckpts is not None:
         raise ValueError(
-            '--resume and --startckpts cannot be both activate')
+            '--resume and --start_ckpts cannot be both activate')
 
     if args.test and args.ckpts is None:
         raise ValueError(

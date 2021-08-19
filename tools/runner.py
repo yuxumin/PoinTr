@@ -25,6 +25,7 @@ def run_net(args, config, train_writer=None, val_writer=None):
     # parameter setting
     start_epoch = 0
     best_metrics = None
+    metrics = None
 
     # resume ckpts
     if args.resume:
@@ -41,7 +42,8 @@ def run_net(args, config, train_writer=None, val_writer=None):
             print_log('Using Synchronized BatchNorm ...', logger = logger)
         base_model = nn.parallel.DistributedDataParallel(base_model, device_ids=[args.local_rank % torch.cuda.device_count()], find_unused_parameters=True)
         print_log('Using Distributed Data parallel ...' , logger = logger)
-    
+    else:
+        base_model = nn.DataParallel(base_model).cuda()
     # optimizer & scheduler
     optimizer, scheduler = builder.build_opti_sche(base_model, config)
     
@@ -78,6 +80,8 @@ def run_net(args, config, train_writer=None, val_writer=None):
             if dataset_name == 'PCN':
                 partial = data[0].cuda()
                 if config.dataset.train._base_.CARS:
+                    if idx == 0:
+                        print_log('padding while KITTI training', logger=logger)
                     partial = misc.random_padding(partial) # specially for KITTI finetune
                 gt = data[1].cuda()
             elif dataset_name == 'ShapeNet':
@@ -90,28 +94,31 @@ def run_net(args, config, train_writer=None, val_writer=None):
             num_iter += 1
            
             ret = base_model(partial)
-            if args.distributed:
-                sparse_loss, dense_loss = base_model.module.get_loss(ret, gt)
-            else:
-                sparse_loss, dense_loss = base_model.get_loss(ret, gt)
+            
+            sparse_loss, dense_loss = base_model.module.get_loss(ret, gt)
          
             _loss = sparse_loss + dense_loss 
             _loss.backward()
 
-            sparse_loss_print = dist_utils.reduce_tensor(sparse_loss, args)
-            dense_loss_print = dist_utils.reduce_tensor(dense_loss, args)
-            losses.update([sparse_loss_print.item() * 1000, dense_loss_print.item() * 1000])
-
+            if args.distributed:
+                sparse_loss = dist_utils.reduce_tensor(sparse_loss, args)
+                dense_loss = dist_utils.reduce_tensor(dense_loss, args)
+                losses.update([sparse_loss.item() * 1000, dense_loss.item() * 1000])
+            else:
+                losses.update([sparse_loss.item() * 1000, dense_loss.item() * 1000])
             # forward
             if num_iter == config.step_per_update:
                 num_iter = 0
                 optimizer.step()
                 base_model.zero_grad()
 
+            if args.distributed:
+                torch.cuda.synchronize()
+
             n_itr = epoch * n_batches + idx
             if train_writer is not None:
-                train_writer.add_scalar('Loss/Batch/Sparse', sparse_loss_print.item() * 1000, n_itr)
-                train_writer.add_scalar('Loss/Batch/Dense', dense_loss_print.item() * 1000, n_itr)
+                train_writer.add_scalar('Loss/Batch/Sparse', sparse_loss.item() * 1000, n_itr)
+                train_writer.add_scalar('Loss/Batch/Dense', dense_loss.item() * 1000, n_itr)
 
             batch_time.update(time.time() - batch_start_time)
             batch_start_time = time.time()
@@ -133,13 +140,14 @@ def run_net(args, config, train_writer=None, val_writer=None):
         print_log('[Training] EPOCH: %d EpochTime = %.3f (s) Losses = %s' %
             (epoch,  epoch_end_time - epoch_start_time, ['%.4f' % l for l in losses.avg()]), logger = logger)
 
-        # Validate the current model
-        metrics = validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val_writer, args, config, logger=logger)
+        if epoch % args.val_freq == 0 and epoch != 0:
+            # Validate the current model
+            metrics = validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val_writer, args, config, logger=logger)
 
-        # Save ckeckpoints
-        if  metrics.better_than(best_metrics):
-            best_metrics = metrics
-            builder.save_checkpoint(base_model, optimizer, epoch, metrics, best_metrics, 'ckpt-best', args, logger = logger)
+            # Save ckeckpoints
+            if  metrics.better_than(best_metrics):
+                best_metrics = metrics
+                builder.save_checkpoint(base_model, optimizer, epoch, metrics, best_metrics, 'ckpt-best', args, logger = logger)
         builder.save_checkpoint(base_model, optimizer, epoch, metrics, best_metrics, 'ckpt-last', args, logger = logger)      
         if (config.max_epoch - epoch) < 10:
             builder.save_checkpoint(base_model, optimizer, epoch, metrics, best_metrics, f'ckpt-epoch-{epoch:03d}', args, logger = logger)     
@@ -181,10 +189,11 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
             dense_loss_l1 =  ChamferDisL1(dense_points, gt)
             dense_loss_l2 =  ChamferDisL2(dense_points, gt)
 
-            sparse_loss_l1 = dist_utils.reduce_tensor(sparse_loss_l1, args)
-            sparse_loss_l2 = dist_utils.reduce_tensor(sparse_loss_l2, args)
-            dense_loss_l1 = dist_utils.reduce_tensor(dense_loss_l1, args)
-            dense_loss_l2 = dist_utils.reduce_tensor(dense_loss_l2, args)
+            if args.distributed:
+                sparse_loss_l1 = dist_utils.reduce_tensor(sparse_loss_l1, args)
+                sparse_loss_l2 = dist_utils.reduce_tensor(sparse_loss_l2, args)
+                dense_loss_l1 = dist_utils.reduce_tensor(dense_loss_l1, args)
+                dense_loss_l2 = dist_utils.reduce_tensor(dense_loss_l2, args)
 
             test_losses.update([sparse_loss_l1.item() * 1000, sparse_loss_l2.item() * 1000, dense_loss_l1.item() * 1000, dense_loss_l2.item() * 1000])
 
@@ -228,24 +237,31 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
             torch.cuda.synchronize()
      
     # Print testing results
-    print('============================ TEST RESULTS ============================')
-    print('Taxonomy', end='\t')
-    print('#Sample', end='\t')
+    shapenet_dict = json.load(open('./data/shapenet_synset_dict.json', 'r'))
+    print_log('============================ TEST RESULTS ============================',logger=logger)
+    msg = ''
+    msg += 'Taxonomy\t'
+    msg += '#Sample\t'
     for metric in test_metrics.items:
-        print(metric, end='\t')
-    print()
+        msg += metric + '\t'
+    msg += '#ModelName\t'
+    print_log(msg, logger=logger)
 
     for taxonomy_id in category_metrics:
-        print(taxonomy_id, end='\t')
-        print(category_metrics[taxonomy_id].count(0), end='\t')
+        msg = ''
+        msg += (taxonomy_id + '\t')
+        msg += (str(category_metrics[taxonomy_id].count(0)) + '\t')
         for value in category_metrics[taxonomy_id].avg():
-            print('%.4f' % value, end='\t')
-        print()
+            msg += '%.4f \t' % value
+        msg += shapenet_dict[taxonomy_id] + '\t'
+        print_log(msg, logger=logger)
 
+    msg = ''
+    msg += 'Overall\t\t\t'
     print('Overall', end='\t\t\t')
     for value in test_metrics.avg():
-        print('%.4f' % value, end='\t')
-    print('\n')
+        msg += '%.4f \t' % value
+    print_log(msg, logger=logger)
 
     # Add testing results to TensorBoard
     if val_writer is not None:
@@ -276,11 +292,7 @@ def test_net(args, config):
 
     #  DDP    
     if args.distributed:
-        if args.sync_bn:
-            base_model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(base_model)
-            print_log('Using Synchronized BatchNorm ...', logger = logger)
-        base_model = nn.parallel.DistributedDataParallel(base_model, device_ids=[args.local_rank % torch.cuda.device_count()])
-        print_log('Using Distributed Data parallel ...', logger = logger)
+        raise NotImplementedError()
 
     # Criterion
     ChamferDisL1 = ChamferDistanceL1()
@@ -372,8 +384,6 @@ def test(base_model, test_dataloader, ChamferDisL1, ChamferDisL2, args, config, 
                 print_log('Test[%d/%d] Taxonomy = %s Sample = %s Losses = %s Metrics = %s' %
                             (idx + 1, n_samples, taxonomy_id, model_id, ['%.4f' % l for l in test_losses.val()], 
                             ['%.4f' % m for m in _metrics]), logger=logger)
-        if args.distributed:
-            torch.cuda.synchronize()
         if dataset_name == 'KITTI':
             return
         for _,v in category_metrics.items():
@@ -384,24 +394,29 @@ def test(base_model, test_dataloader, ChamferDisL1, ChamferDisL2, args, config, 
 
     # Print testing results
     shapenet_dict = json.load(open('./data/shapenet_synset_dict.json', 'r'))
-    print('============================ TEST RESULTS ============================')
-    print('Taxonomy', end='\t')
-    print('#Sample', end='\t')
+    print_log('============================ TEST RESULTS ============================',logger=logger)
+    msg = ''
+    msg += 'Taxonomy\t'
+    msg += '#Sample\t'
     for metric in test_metrics.items:
-        print(metric, end='\t')
-    print('#ModelName', end='\t')
-    print()
+        msg += metric + '\t'
+    msg += '#ModelName\t'
+    print_log(msg, logger=logger)
+
 
     for taxonomy_id in category_metrics:
-        print(taxonomy_id, end='\t')
-        print(category_metrics[taxonomy_id].count(0), end='\t')
+        msg = ''
+        msg += (taxonomy_id + '\t')
+        msg += (str(category_metrics[taxonomy_id].count(0)) + '\t')
         for value in category_metrics[taxonomy_id].avg():
-            print('%.4f' % value, end='\t')
-        print(shapenet_dict[taxonomy_id], end='\t')
-        print()
+            msg += '%.4f \t' % value
+        msg += shapenet_dict[taxonomy_id] + '\t'
+        print_log(msg, logger=logger)
 
+    msg = ''
+    msg += 'Overall\t\t\t'
     print('Overall', end='\t\t\t')
     for value in test_metrics.avg():
-        print('%.4f' % value, end='\t')
-    print('\n')
+        msg += '%.4f \t' % value
+    print_log(msg, logger=logger)
     return 
