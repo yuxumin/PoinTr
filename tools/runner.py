@@ -257,8 +257,7 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
         print_log(msg, logger=logger)
 
     msg = ''
-    msg += 'Overall\t\t\t'
-    print('Overall', end='\t\t\t')
+    msg += 'Overall\t\t'
     for value in test_metrics.avg():
         msg += '%.4f \t' % value
     print_log(msg, logger=logger)
@@ -414,8 +413,7 @@ def test(base_model, test_dataloader, ChamferDisL1, ChamferDisL2, args, config, 
         print_log(msg, logger=logger)
 
     msg = ''
-    msg += 'Overall\t\t\t'
-    print('Overall', end='\t\t\t')
+    msg += 'Overall \t\t'
     for value in test_metrics.avg():
         msg += '%.4f \t' % value
     print_log(msg, logger=logger)

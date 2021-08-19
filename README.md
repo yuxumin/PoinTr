@@ -14,7 +14,7 @@ PoinTr is a transformer-style architecture that reformulates point cloud complet
 
  - PoinTr for PCN [[Tsinghua Cloud](https://cloud.tsinghua.edu.cn/f/55b01b2990e040aa9cb0/?dl=1)] [[Google Drive](https://drive.google.com/file/d/182xUHiUyIQhgqstFTVPoCyYyxmdiZlxq/view?usp=sharing)] [[BaiDuYun]](https://pan.baidu.com/s/1iGenIM076akP8EgbYFBWyw)(code:9g79)
  - PoinTr for ShapeNet-55 [[Tsinghua Cloud](https://cloud.tsinghua.edu.cn/f/4a7027b83da343bb9ac9/?dl=1)] [[Google Drive](https://drive.google.com/file/d/1WzERLlbSwzGOBybzkjBrApwyVMTG00CJ/view?usp=sharing)] [[BaiDuYun]](https://pan.baidu.com/s/1T4NqN5HQkInDTlNAX2KHbQ) (code:erdh) 
- - PoinTr for ShapeNet-34 [[Tsinghua Cloud](https://cloud.tsinghua.edu.cn/f/ac82414f884d445ebd54/?dl=1)] [[Google Drive](https://drive.google.com/file/d/1FA1vxFh1WAa0agYMlBXo-l8cEGzED_-d/view?usp=sharing)] [[BaiDuYun]](https://pan.baidu.com/s/1kPeoFDeaaysWVieuQnJQ6g) (code:elt9) 
+ - PoinTr for ShapeNet-34 [[Tsinghua Cloud](https://cloud.tsinghua.edu.cn/f/ac82414f884d445ebd54/?dl=1)] [[Google Drive](https://drive.google.com/file/d/1Xy6wZjgJNhOYe3wDA-SbLMmGwBJ0jcBz/view?usp=sharing)] [[BaiDuYun]](https://pan.baidu.com/s/1zAxYf_9ixixqR7lvnBsRNQ) (code:atbb ) 
  - PoinTr for KITTI [Coming soon]   
 
 ## Usage
@@ -79,7 +79,9 @@ To train PointCompletion models from scratch, run:
 
 ```
 # Using DDP
-# bash ./scipt/dist_train.sh <NUM_GPU> <port> --config <config> --exp_name <name> [--resume] [--start_ckpts <path>]
+# bash ./scipt/dist_train.sh <NUM_GPU> <port> --config <config> --exp_name <name> [--resume] [--start_ckpts <path>] [--val_freq <int>]
+# or just using DP
+# bash ./scipt/train.sh <GPUIDS> --config <config> --exp_name <name> [--resume] [--start_ckpts <path>] [--val_freq <int>]
 ```
 ####  for example:
 Train a PoinTr model on PCN benchmark with 0,1 gpus
