@@ -106,11 +106,6 @@ class PCN(data.Dataset):
 
         if self.transforms is not None:
             data = self.transforms(data)
-        
-        if self.cars:
-            # to mimic the kitti data distribution
-            data['partial'] = data['partial'] * 1.1
-            data['gt'] = data['gt'] * 1.1
 
         return sample['taxonomy_id'], sample['model_id'], (data['partial'], data['gt'])
 
