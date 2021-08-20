@@ -265,7 +265,7 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
     # Add testing results to TensorBoard
     if val_writer is not None:
         val_writer.add_scalar('Loss/Epoch/Sparse', test_losses.avg(0), epoch)
-        val_writer.add_scalar('Loss/Epoch/Dense', test_losses.avg(1), epoch)
+        val_writer.add_scalar('Loss/Epoch/Dense', test_losses.avg(2), epoch)
         for i, metric in enumerate(test_metrics.items):
             val_writer.add_scalar('Metric/%s' % metric, test_metrics.avg(i), epoch)
 
