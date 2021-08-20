@@ -25,12 +25,15 @@ def get_arch(nlevels, npts):
 
 @MODELS.register_module()
 class TopNet(nn.Module):
-    def __init__(self, node_feature = 8, encoder_feature = 1024, nlevels = 8, num_pred = 2048):
+    def __init__(self, config): # node_feature = 8, encoder_feature = 1024, nlevels = 8, num_pred = 2048
         super().__init__()
-        self.tarch = get_arch(nlevels, num_pred)
-        self.nlevels = nlevels
-        self.node_feature = node_feature
-        self.Top_in_channel = encoder_feature + self.node_feature
+        self.node_feature = config.node_feature
+        self.encoder_feature = config.encoder_feature
+        self.nlevels = config.nlevels       
+        self.num_pred = config.num_pred
+
+        self.tarch = get_arch(self.nlevels, self.num_pred)
+        self.Top_in_channel = self.encoder_feature + self.node_feature
         self.Top_out_channel = self.node_feature
         self.first_conv = nn.Sequential(
             nn.Conv1d(3,128,1),
@@ -42,16 +45,16 @@ class TopNet(nn.Module):
             nn.Conv1d(512,512,1),
             nn.BatchNorm1d(512),
             nn.ReLU(inplace=True),
-            nn.Conv1d(512,encoder_feature,1)
+            nn.Conv1d(512,self.encoder_feature,1)
         )
         self.root_layer = nn.Sequential(
-            nn.Linear(encoder_feature,256),
+            nn.Linear(self.encoder_feature,256),
             nn.BatchNorm1d(256),
             nn.ReLU(inplace=True),
             nn.Linear(256,64),
             nn.BatchNorm1d(64),
             nn.ReLU(inplace=True),
-            nn.Linear(64 , node_feature * int(self.tarch[0])),
+            nn.Linear(64 , self.node_feature * int(self.tarch[0])),
             nn.Tanh()
         )
         self.leaf_layer = self.get_tree_layer(self.Top_in_channel, 3, int(self.tarch[-1]))
@@ -61,10 +64,10 @@ class TopNet(nn.Module):
     def build_loss_func(self):
         self.loss_func = ChamferDistanceL2()
 
-    def get_loss(self, ret):
-        pass
-        return
-    
+    def get_loss(self, ret, gt):
+        loss_coarse = self.loss_func(ret[0], gt)
+        loss_fine = self.loss_func(ret[1], gt)
+        return loss_coarse, loss_fine
     
     @staticmethod
     def get_tree_layer(in_channel, out_channel, node):
@@ -100,4 +103,4 @@ class TopNet(nn.Module):
             else:
                 layer_feature = self.feature_layers[i-1](torch.cat([expand_feature,last_level],dim=1)).reshape(bs, self.node_feature, -1)
             outs.append(nn.Tanh()(layer_feature)) 
-        return outs[-1].transpose(1,2).contiguous()
+        return (outs[-1].transpose(1,2).contiguous(), outs[-1].transpose(1,2).contiguous())

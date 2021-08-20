@@ -1,0 +1,28 @@
+optimizer : {
+  type: Adam,
+  kwargs: {
+  lr : 0.0001,
+  weight_decay : 0
+}}
+scheduler: {
+  type: StepLR,
+  kwargs: {
+  step_size: 50,
+  gamma : 0.5
+}}
+
+dataset : {
+  train : { _base_: cfgs/dataset_configs/PCN.yaml, 
+            others: {subset: 'train'}},
+  val : { _base_: cfgs/dataset_configs/PCN.yaml, 
+            others: {subset: 'test'}},
+  test : { _base_: cfgs/dataset_configs/PCN.yaml, 
+            others: {subset: 'test'}}}
+            
+model : {
+  NAME: FoldingNet, num_pred: 16384, encoder_channel: 1024}
+total_bs : 32  
+step_per_update : 1
+max_epoch : 150
+
+consider_metric: CDL1

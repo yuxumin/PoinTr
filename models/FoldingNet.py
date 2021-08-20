@@ -5,10 +5,11 @@ from extensions.chamfer_dist import ChamferDistanceL2
 
 @MODELS.register_module()
 class FoldingNet(nn.Module):
-    def __init__(self, num_pred, encoder_channel = 1024):
+    def __init__(self, config):
         super().__init__()
-        self.grid_size = int(pow(num_pred,0.5) + 0.5)
-        self.encoder_channel = encoder_channel
+        self.num_pred = config.num_pred
+        self.encoder_channel = config.encoder_channel
+        self.grid_size = int(pow(self.num_pred,0.5) + 0.5)
 
         self.first_conv = nn.Sequential(
             nn.Conv1d(3,128,1),
@@ -20,11 +21,11 @@ class FoldingNet(nn.Module):
             nn.Conv1d(512,512,1),
             nn.BatchNorm1d(512),
             nn.ReLU(inplace=True),
-            nn.Conv1d(512,encoder_channel,1)
+            nn.Conv1d(512,self.encoder_channel,1)
         )
 
         self.folding1 = nn.Sequential(
-            nn.Conv1d(encoder_channel + 2, 512, 1),
+            nn.Conv1d(self.encoder_channel + 2, 512, 1),
             nn.BatchNorm1d(512),
             nn.ReLU(inplace=True),
             nn.Conv1d(512, 512, 1),
@@ -34,7 +35,7 @@ class FoldingNet(nn.Module):
         )
 
         self.folding2 = nn.Sequential(
-            nn.Conv1d(encoder_channel + 3, 512, 1),
+            nn.Conv1d(self.encoder_channel + 3, 512, 1),
             nn.BatchNorm1d(512),
             nn.ReLU(inplace=True),
             nn.Conv1d(512, 512, 1),
@@ -51,9 +52,10 @@ class FoldingNet(nn.Module):
     def build_loss_func(self):
         self.loss_func = ChamferDistanceL2()
 
-    def get_loss(self, ret):
-        pass
-        return   
+    def get_loss(self, ret, gt):
+        loss_coarse = self.loss_func(ret[0], gt)
+        loss_fine = self.loss_func(ret[1], gt)
+        return loss_coarse, loss_fine
 
     def forward(self, xyz):
         bs , n , _ = xyz.shape
@@ -65,7 +67,7 @@ class FoldingNet(nn.Module):
         feature_global = torch.max(feature,dim=2,keepdim=False)[0] # B 1024
         # folding decoder
         fd1, fd2 = self.decoder(feature_global) # B N 3
-        return fd2 
+        return (fd2, fd2) # FoldingNet producing final result directly
         
     def decoder(self,x):
         num_sample = self.grid_size * self.grid_size
