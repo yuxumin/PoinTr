@@ -81,7 +81,9 @@ class DGCNN_Grouper(nn.Module):
         # x: bs, 3, np
 
         # bs 3 N(128)   bs C(224)128 N(128)
-
+        if x.size(2) < 16:
+            padding = torch.zeros(x.size(0), 3, 16 - x.size(2)).to(x.device)
+            x = torch.cat([x, padding], dim=-1)
         coor = x
         f = self.input_trans(x)
 

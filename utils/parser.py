@@ -65,7 +65,7 @@ def get_args():
         os.environ['LOCAL_RANK'] = str(args.local_rank)
 
     if args.test:
-        args.exp_name = 'test' + args.exp_name
+        args.exp_name = 'test_' + args.exp_name
     if args.mode is not None:
         args.exp_name = args.exp_name + '_' +args.mode
     args.experiment_path = os.path.join('./experiments', Path(args.config).stem, Path(args.config).parent.stem, args.exp_name)

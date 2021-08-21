@@ -43,6 +43,24 @@ class ChamferDistanceL2(torch.nn.Module):
         dist1, dist2 = ChamferFunction.apply(xyz1, xyz2)
         return torch.mean(dist1) + torch.mean(dist2)
 
+class ChamferDistanceL2_split(torch.nn.Module):
+    f''' Chamder Distance L2
+    '''
+    def __init__(self, ignore_zeros=False):
+        super().__init__()
+        self.ignore_zeros = ignore_zeros
+
+    def forward(self, xyz1, xyz2):
+        batch_size = xyz1.size(0)
+        if batch_size == 1 and self.ignore_zeros:
+            non_zeros1 = torch.sum(xyz1, dim=2).ne(0)
+            non_zeros2 = torch.sum(xyz2, dim=2).ne(0)
+            xyz1 = xyz1[non_zeros1].unsqueeze(dim=0)
+            xyz2 = xyz2[non_zeros2].unsqueeze(dim=0)
+
+        dist1, dist2 = ChamferFunction.apply(xyz1, xyz2)
+        return torch.mean(dist1), torch.mean(dist2)
+
 class ChamferDistanceL1(torch.nn.Module):
     f''' Chamder Distance L1
     '''

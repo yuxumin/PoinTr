@@ -43,6 +43,7 @@ def run_net(args, config, train_writer=None, val_writer=None):
         base_model = nn.parallel.DistributedDataParallel(base_model, device_ids=[args.local_rank % torch.cuda.device_count()], find_unused_parameters=True)
         print_log('Using Distributed Data parallel ...' , logger = logger)
     else:
+        print_log('Using Data parallel ...' , logger = logger)
         base_model = nn.DataParallel(base_model).cuda()
     # optimizer & scheduler
     optimizer, scheduler = builder.build_opti_sche(base_model, config)
@@ -79,11 +80,13 @@ def run_net(args, config, train_writer=None, val_writer=None):
             dataset_name = config.dataset.train._base_.NAME
             if dataset_name == 'PCN':
                 partial = data[0].cuda()
+                gt = data[1].cuda()
                 if config.dataset.train._base_.CARS:
                     if idx == 0:
                         print_log('padding while KITTI training', logger=logger)
-                    partial = misc.random_padding(partial) # specially for KITTI finetune
-                gt = data[1].cuda()
+                    partial = misc.random_dropping(partial) # specially for KITTI finetune
+                    partial, gt = misc.random_scale(partial, gt, scale_range=[0.97, 1.03]) # specially for KITTI finetune
+
             elif dataset_name == 'ShapeNet':
                 gt = data.cuda()
                 partial, _ = misc.seprate_point_cloud(gt, npoints, [int(npoints * 1/4) , int(npoints * 3/4)], fixed_points = None)
@@ -100,17 +103,19 @@ def run_net(args, config, train_writer=None, val_writer=None):
             _loss = sparse_loss + dense_loss 
             _loss.backward()
 
+            # forward
+            if num_iter == config.step_per_update:
+                num_iter = 0
+                optimizer.step()
+                base_model.zero_grad()
+
             if args.distributed:
                 sparse_loss = dist_utils.reduce_tensor(sparse_loss, args)
                 dense_loss = dist_utils.reduce_tensor(dense_loss, args)
                 losses.update([sparse_loss.item() * 1000, dense_loss.item() * 1000])
             else:
                 losses.update([sparse_loss.item() * 1000, dense_loss.item() * 1000])
-            # forward
-            if num_iter == config.step_per_update:
-                num_iter = 0
-                optimizer.step()
-                base_model.zero_grad()
+
 
             if args.distributed:
                 torch.cuda.synchronize()

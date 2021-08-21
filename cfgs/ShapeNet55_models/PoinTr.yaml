@@ -11,6 +11,14 @@ scheduler: {
   lr_decay: 0.76,
   lowest_decay: 0.02  # min lr = lowest_decay * lr
 }}
+bnmscheduler: {
+  type: Lambda,
+  kwargs: {
+  decay_step: 21,
+  bn_decay: 0.5,
+  bn_momentum: 0.9,
+  lowest_decay: 0.01
+}}
 
 dataset : {
   train : { _base_: cfgs/dataset_configs/ShapeNet-55.yaml, 
@@ -21,7 +29,7 @@ dataset : {
             others: {subset: 'test'}}}
 model : {
   NAME: PoinTr, num_pred: 6144, num_query: 96, knn_layer: 1, trans_dim: 384}
-total_bs : 128
+total_bs : 96
 step_per_update : 1
 max_epoch : 200
 
