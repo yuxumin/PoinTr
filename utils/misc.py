@@ -237,9 +237,11 @@ def random_dropping(pc):
     pc = pc
     random_num = torch.randint(16, 1024, (1,1))[0,0]
     pc = fps(pc, random_num)
+    padding = torch.zeros(pc.size(0), 2048 - pc.size(1), 3).to(pc.device)
+    pc = torch.cat([pc, padding], dim = 1)
     return pc
     
 
-def random_scale(partial, gt, scale_range=[0.8, 1.2]):
+def random_scale(partial, scale_range=[0.8, 1.2]):
     scale = torch.rand(1).cuda() * (scale_range[1] - scale_range[0]) + scale_range[0]
-    return partial * scale, gt * scale
+    return partial * scale

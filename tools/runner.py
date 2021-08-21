@@ -85,7 +85,7 @@ def run_net(args, config, train_writer=None, val_writer=None):
                     if idx == 0:
                         print_log('padding while KITTI training', logger=logger)
                     partial = misc.random_dropping(partial) # specially for KITTI finetune
-                    partial, gt = misc.random_scale(partial, gt, scale_range=[0.97, 1.03]) # specially for KITTI finetune
+                    partial = misc.random_scale(partial, scale_range=[0.95, 1.05]) # specially for KITTI finetune
 
             elif dataset_name == 'ShapeNet':
                 gt = data.cuda()
