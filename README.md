@@ -125,7 +125,7 @@ MIT License
 Our code is inspired by [GRNet](https://github.com/hzxie/GRNet) and [mmdetection3d](https://github.com/open-mmlab/mmdetection3d).
 
 ## Citation
-If you find our work useful in your research, please consider citing:
+If you find our work useful in your research, please consider citing: 
 ```
 @inproceedings{yu2021pointr,
   title={PoinTr: Diverse Point Cloud Completion with Geometry-Aware Transformers},
