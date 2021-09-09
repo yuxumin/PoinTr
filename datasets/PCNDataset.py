@@ -92,9 +92,7 @@ class PCN(data.Dataset):
     def __getitem__(self, idx):
         sample = self.file_list[idx]
         data = {}
-        rand_idx = -1
-        if self.cars:
-            rand_idx = random.randint(0, self.n_renderings - 1) if self.subset=='train' else 0
+        rand_idx = random.randint(0, self.n_renderings - 1) if self.subset=='train' else 0
 
         for ri in ['partial', 'gt']:
             file_path = sample['%s_path' % ri]
