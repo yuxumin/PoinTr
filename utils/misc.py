@@ -209,8 +209,8 @@ def visualize_KITTI(path, data_list, titles = ['input','pred'], cmap=['bwr','aut
     fig = plt.figure(figsize=(6*len(data_list),6))
     cmax = data_list[-1][:,0].max()
 
-    for i in range(2):
-        data = data_list[i]
+    for i in range(len(data_list)):
+        data = data_list[i][:-2048] if i == 1 else data_list[i]
         color = data[:,0] /cmax
         ax = fig.add_subplot(1, len(data_list) , i + 1, projection='3d')
         ax.view_init(30, -120)
@@ -233,9 +233,10 @@ def visualize_KITTI(path, data_list, titles = ['input','pred'], cmap=['bwr','aut
     plt.close(fig)
 
 
-def random_dropping(pc):
+def random_dropping(pc, e):
+    up_num = max(64, 768 // (e//50 + 1))
     pc = pc
-    random_num = torch.randint(16, 1024, (1,1))[0,0]
+    random_num = torch.randint(1, up_num, (1,1))[0,0]
     pc = fps(pc, random_num)
     padding = torch.zeros(pc.size(0), 2048 - pc.size(1), 3).to(pc.device)
     pc = torch.cat([pc, padding], dim = 1)

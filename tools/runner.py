@@ -84,8 +84,7 @@ def run_net(args, config, train_writer=None, val_writer=None):
                 if config.dataset.train._base_.CARS:
                     if idx == 0:
                         print_log('padding while KITTI training', logger=logger)
-                    partial = misc.random_dropping(partial) # specially for KITTI finetune
-                    partial = misc.random_scale(partial, scale_range=[0.95, 1.05]) # specially for KITTI finetune
+                    partial = misc.random_dropping(partial, epoch) # specially for KITTI finetune
 
             elif dataset_name == 'ShapeNet':
                 gt = data.cuda()
@@ -129,14 +128,14 @@ def run_net(args, config, train_writer=None, val_writer=None):
             batch_start_time = time.time()
 
             if idx % 100 == 0:
-                print_log('[Epoch %d/%d][Batch %d/%d] BatchTime = %.3f (s) DataTime = %.3f (s) Losses = %s lr = %.4f' %
+                print_log('[Epoch %d/%d][Batch %d/%d] BatchTime = %.3f (s) DataTime = %.3f (s) Losses = %s lr = %.6f' %
                             (epoch, config.max_epoch, idx + 1, n_batches, batch_time.val(), data_time.val(),
                             ['%.4f' % l for l in losses.val()], optimizer.param_groups[0]['lr']), logger = logger)
         if isinstance(scheduler, list):
             for item in scheduler:
-                item.step()
+                item.step(epoch)
         else:
-            scheduler.step()
+            scheduler.step(epoch)
         epoch_end_time = time.time()
 
         if train_writer is not None:

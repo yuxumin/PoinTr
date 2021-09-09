@@ -136,9 +136,12 @@ dmypy.json
 
 experiments/
 data/ShapeNet55-34/shapenet_pc
+data/ShapeNet55-34/clean*
 data/KITTI/cars
 data/KITTI/bboxes
 data/KITTI/tracklets
 data/PCN/train
 data/PCN/test
 data/PCN/val
+upload*
+KITTI_VIS/
