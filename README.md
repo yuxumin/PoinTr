@@ -13,18 +13,18 @@ PoinTr is a transformer-based model for point cloud completion.  By representing
 ![intro](fig/pointr.gif)
 
 ## 🔥News
-- Fix a bug in `datasets/PCNDataset.py`[(#27)](https://github.com/hzxie/GRNet/pull/27), and update the performance of PoinTr on PCN benchmark (from 8.38 to 7.26).
+- Fix a bug in `datasets/PCNDataset.py`[(#27)](https://github.com/hzxie/GRNet/pull/27), and update the performance of PoinTr on PCN benchmark (CD from `8.38` to `7.26`).
 
 ## Pretrained Models
 
 We provide pretrained PoinTr models:
-| dataset  | url|
-| --- | --- |  
-| ShapeNet-55 | [[Tsinghua Cloud](https://cloud.tsinghua.edu.cn/f/4a7027b83da343bb9ac9/?dl=1)] / [[Google Drive](https://drive.google.com/file/d/1WzERLlbSwzGOBybzkjBrApwyVMTG00CJ/view?usp=sharing)] / [[BaiDuYun](https://pan.baidu.com/s/1T4NqN5HQkInDTlNAX2KHbQ)] (code:erdh) |
-| ShapeNet-34 | [[Tsinghua Cloud](https://cloud.tsinghua.edu.cn/f/ac82414f884d445ebd54/?dl=1)] / [[Google Drive](https://drive.google.com/file/d/1Xy6wZjgJNhOYe3wDA-SbLMmGwBJ0jcBz/view?usp=sharing)] / [[BaiDuYun](https://pan.baidu.com/s/1zAxYf_9ixixqR7lvnBsRNQ)] (code:atbb ) |
-| PCN |  [[Tsinghua Cloud](https://cloud.tsinghua.edu.cn/f/55b01b2990e040aa9cb0/?dl=1)] / [[Google Drive](https://drive.google.com/file/d/182xUHiUyIQhgqstFTVPoCyYyxmdiZlxq/view?usp=sharing)]  / [[BaiDuYun](https://pan.baidu.com/s/1iGenIM076akP8EgbYFBWyw)] (code:9g79) |
-| PCN_new |  [[Tsinghua Cloud](https://cloud.tsinghua.edu.cn/f/444d34a062354c6ead68/?dl=1)] / [[Google Drive](https://drive.google.com/file/d/1qKhPKNf6o0jWnki5d0MGXQtBbgBSDIYo/view?usp=sharing)]  / [[BaiDuYun](https://pan.baidu.com/s/1RHsGXABzz7rbcq4syhg1hA)] (code:aru3 ) |
-| KITTI | coming soon |
+| dataset  | url| performance |
+| --- | --- |  --- |
+| ShapeNet-55 | [[Tsinghua Cloud](https://cloud.tsinghua.edu.cn/f/4a7027b83da343bb9ac9/?dl=1)] / [[Google Drive](https://drive.google.com/file/d/1WzERLlbSwzGOBybzkjBrApwyVMTG00CJ/view?usp=sharing)] / [[BaiDuYun](https://pan.baidu.com/s/1T4NqN5HQkInDTlNAX2KHbQ)] (code:erdh) | AvgCD = 1.09|
+| ShapeNet-34 | [[Tsinghua Cloud](https://cloud.tsinghua.edu.cn/f/ac82414f884d445ebd54/?dl=1)] / [[Google Drive](https://drive.google.com/file/d/1Xy6wZjgJNhOYe3wDA-SbLMmGwBJ0jcBz/view?usp=sharing)] / [[BaiDuYun](https://pan.baidu.com/s/1zAxYf_9ixixqR7lvnBsRNQ)] (code:atbb ) | AvgCD = 2.05| 
+| PCN |  [[Tsinghua Cloud](https://cloud.tsinghua.edu.cn/f/55b01b2990e040aa9cb0/?dl=1)] / [[Google Drive](https://drive.google.com/file/d/182xUHiUyIQhgqstFTVPoCyYyxmdiZlxq/view?usp=sharing)]  / [[BaiDuYun](https://pan.baidu.com/s/1iGenIM076akP8EgbYFBWyw)] (code:9g79) | AvgCD = 8.38|
+| PCN_new |  [[Tsinghua Cloud](https://cloud.tsinghua.edu.cn/f/444d34a062354c6ead68/?dl=1)] / [[Google Drive](https://drive.google.com/file/d/1qKhPKNf6o0jWnki5d0MGXQtBbgBSDIYo/view?usp=sharing)]  / [[BaiDuYun](https://pan.baidu.com/s/1RHsGXABzz7rbcq4syhg1hA)] (code:aru3 ) |AvgCD = 7.26|
+| KITTI | coming soon | -- |
 
 ## Usage
 
@@ -65,22 +65,37 @@ The details of our new ***ShapeNet-55/34*** datasets and other existing datasets
 To evaluate a pre-trained PoinTr model on the Three Dataset with single GPU, run:
 
 ```
-bash ./scripts/test.sh <GPU_IDS> --ckpts <path> --config <config> --exp_name <name> [--mode <easy/median/hard>]
+bash ./scripts/test.sh <GPU_IDS>  \
+    --ckpts <path> \
+    --config <config> \
+    --exp_name <name> \
+    [--mode <easy/median/hard>]
 ```
 
 ####  Some examples:
 Test the PoinTr pretrained model on the PCN benchmark:
 ```
-bash ./scripts/test.sh 0 --ckpts ./pretrained/PoinTr_PCN.pth --config ./cfgs/PCN_models/PoinTr.yaml --exp_name example
+bash ./scripts/test.sh 0 \
+    --ckpts ./pretrained/PoinTr_PCN.pth \
+    --config ./cfgs/PCN_models/PoinTr.yaml \
+    --exp_name example
 ```
 Test the PoinTr pretrained model on ShapeNet55 benchmark (*easy* mode):
 ```
-bash ./scripts/test.sh 0 --ckpts ./pretrained/PoinTr_ShapeNet55.pth --config ./cfgs/ShapeNet55_models/PoinTr.yaml --mode easy --exp_name example
+bash ./scripts/test.sh 0 \
+    --ckpts ./pretrained/PoinTr_ShapeNet55.pth \
+    --config ./cfgs/ShapeNet55_models/PoinTr.yaml \
+    --mode easy \
+    --exp_name example
 ```
 Test the PoinTr pretrained model on the KITTI benchmark:
 ```
-bash ./scripts/test.sh 0 --ckpts ./pretrained/PoinTr_KITTI.pth --config ./cfgs/KITTI_models/PoinTr.yaml --exp_name example
-CUDA_VISIBLE_DEVICES=0 python KITTI_metric.py --vis <visualization_path> # for example ./experiments/PoinTr/KITTI_models/test_example/vis_result
+bash ./scripts/test.sh 0 \
+    --ckpts ./pretrained/PoinTr_KITTI.pth \
+    --config ./cfgs/KITTI_models/PoinTr.yaml \
+    --exp_name example
+CUDA_VISIBLE_DEVICES=0 python KITTI_metric.py \
+    --vis <visualization_path> 
 ```
 
 ### Training
@@ -89,33 +104,54 @@ To train a point cloud completion model from scratch, run:
 
 ```
 # Use DistributedDataParallel (DDP)
-bash ./scripts/dist_train.sh <NUM_GPU> <port> --config <config> --exp_name <name> [--resume] [--start_ckpts <path>] [--val_freq <int>]
+bash ./scripts/dist_train.sh <NUM_GPU> <port> \
+    --config <config> \
+    --exp_name <name> \
+    [--resume] \
+    [--start_ckpts <path>] \
+    [--val_freq <int>]
 # or just use DataParallel (DP)
-bash ./scripts/train.sh <GPUIDS> --config <config> --exp_name <name> [--resume] [--start_ckpts <path>] [--val_freq <int>]
+bash ./scripts/train.sh <GPUIDS> \
+    --config <config> \
+    --exp_name <name> \
+    [--resume] \
+    [--start_ckpts <path>] \
+    [--val_freq <int>]
 ```
 ####  Some examples:
 Train a PoinTr model on PCN benchmark with 2 gpus:
 ```
-CUDA_VISIBLE_DEVICES=0,1 bash ./scripts/dist_train.sh 2 13232 --config ./cfgs/PCN_models/PoinTr.yaml --exp_name example
+CUDA_VISIBLE_DEVICES=0,1 bash ./scripts/dist_train.sh 2 13232 \
+    --config ./cfgs/PCN_models/PoinTr.yaml \
+    --exp_name example
 ```
 Resume a checkpoint:
 ```
-CUDA_VISIBLE_DEVICES=0,1 bash ./scripts/dist_train.sh 2 13232 --config ./cfgs/PCN_models/PoinTr.yaml --exp_name example --resume
+CUDA_VISIBLE_DEVICES=0,1 bash ./scripts/dist_train.sh 2 13232 \
+    --config ./cfgs/PCN_models/PoinTr.yaml \
+    --exp_name example --resume
 ```
 
 Finetune a PoinTr on PCNCars
 ```
-CUDA_VISIBLE_DEVICES=0,1 bash ./scripts/dist_train.sh 2 13232 --config ./cfgs/KITTI_models/PoinTr.yaml --exp_name example --start_ckpts ./weight.pth
+CUDA_VISIBLE_DEVICES=0,1 bash ./scripts/dist_train.sh 2 13232 \
+    --config ./cfgs/KITTI_models/PoinTr.yaml \
+    --exp_name example \
+    --start_ckpts ./weight.pth
 ```
 
 Train a PoinTr model with a single GPU:
 ```
-bash ./scripts/train.sh 0 --config ./cfgs/KITTI_models/PoinTr.yaml --exp_name example
+bash ./scripts/train.sh 0 \
+    --config ./cfgs/KITTI_models/PoinTr.yaml \
+    --exp_name example
 ```
 
 We also provide the Pytorch implementation of several baseline models including GRNet, PCN, TopNet and FoldingNet. For example, to train a GRNet model on ShapeNet-55, run:
 ```
-CUDA_VISIBLE_DEVICES=0,1 bash ./scripts/dist_train.sh 2 13232 --config ./cfgs/ShapeNet55_models/GRNet.yaml --exp_name example
+CUDA_VISIBLE_DEVICES=0,1 bash ./scripts/dist_train.sh 2 13232 \
+    --config ./cfgs/ShapeNet55_models/GRNet.yaml \
+    --exp_name example
 ```
 
 ### Completion Results on ShapeNet55 and KITTI-Cars
