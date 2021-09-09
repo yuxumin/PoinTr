@@ -64,12 +64,6 @@ To evaluate a pre-trained PoinTr model on the Three Dataset with single GPU, run
 bash ./scripts/test.sh <GPU_IDS> --ckpts <path> --config <config> --exp_name <name> [--mode <easy/median/hard>]
 ```
 
-To evaluate the performance of a model on KITTI dataset, run:
-```
-bash ./scripts/test.sh <GPU_IDS> --ckpts <path> --config <config> --exp <name>
-CUDA_VISIBLE_DEVICES=0 python KITTI_metric.py --vis <visualization_path> # for example ./experiments/PoinTr/KITTI_models/test_0909/vis_result
-```
-
 ####  Some examples:
 Test the PoinTr pretrained model on the PCN benchmark:
 ```
@@ -82,6 +76,7 @@ bash ./scripts/test.sh 0 --ckpts ./pretrained/PoinTr_ShapeNet55.pth --config ./c
 Test the PoinTr pretrained model on the KITTI benchmark:
 ```
 bash ./scripts/test.sh 0 --ckpts ./pretrained/PoinTr_KITTI.pth --config ./cfgs/KITTI_models/PoinTr.yaml --exp_name example
+CUDA_VISIBLE_DEVICES=0 python KITTI_metric.py --vis <visualization_path> # for example ./experiments/PoinTr/KITTI_models/test_example/vis_result
 ```
 
 ### Training
