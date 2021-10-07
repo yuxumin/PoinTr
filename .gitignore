@@ -145,3 +145,4 @@ data/PCN/test
 data/PCN/val
 upload*
 KITTI_VIS/
+models/pointrvrc/mm3d_pn2
