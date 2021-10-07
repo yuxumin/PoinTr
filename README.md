@@ -170,7 +170,7 @@ If you find our work useful in your research, please consider citing:
 ```
 @inproceedings{yu2021pointr,
   title={PoinTr: Diverse Point Cloud Completion with Geometry-Aware Transformers},
-  author={Yu, Xumin and Rao, Yongming and Wang, Ziyi and Liu Zuyan, and Lu, Jiwen and Zhou, Jie},
+  author={Yu, Xumin and Rao, Yongming and Wang, Ziyi and Liu Zuyan and Lu, Jiwen and Zhou, Jie},
   booktitle={ICCV},
   year={2021}
 }
