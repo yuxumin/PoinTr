@@ -13,7 +13,7 @@ PoinTr is a transformer-based model for point cloud completion.  By representing
 ![intro](fig/pointr.gif)
 
 ## 🔥News
-- **2021-10-07** Our PoinTr wins the ***Championship*** on [MVP Completion Challenge (ICCV Workshop 2021)](https://mvp-dataset.github.io/MVP/Completion.html), the code is coming soon.
+- **2021-10-07** Our solution based on PoinTr wins the ***Championship*** on [MVP Completion Challenge (ICCV Workshop 2021)](https://mvp-dataset.github.io/MVP/Completion.html). The code will come soon.
 - **2021-09-09** Fix a bug in `datasets/PCNDataset.py`[(#27)](https://github.com/hzxie/GRNet/pull/27), and update the performance of PoinTr on PCN benchmark (CD from 8.38 to ***7.26***).
 
 ## Pretrained Models
