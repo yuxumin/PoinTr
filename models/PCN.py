@@ -8,7 +8,7 @@ class PCN(nn.Module):
     def __init__(self, config):
         super().__init__()
         self.number_fine = config.num_pred
-        self.encoder_channal = config.encoder_channel
+        self.encoder_channel = config.encoder_channel
         grid_size = 4 # set default
         self.grid_size = grid_size
         assert self.number_fine % grid_size**2 == 0
