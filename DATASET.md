@@ -38,7 +38,7 @@ The overall directory structure should be:
    └── test.txt
 ```
 
-**PCN Dataset**: You can download the processed PCN dataset from this [url](https://gateway.infinitescript.com/?fileName=ShapeNetCompletion). The directory structure should be
+**PCN Dataset**: You can download the processed PCN dataset from this [url](https://gateway.infinitescript.com/?fileName=ShapeNetCompletion) or [BaiduYun](https://pan.baidu.com/s/1Oj-2F_eHMopLF2CWnd8T3A)(code: hg24 ). The directory structure should be
 
 ```
 │PCN/
