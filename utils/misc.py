@@ -187,7 +187,10 @@ def get_ptcloud_img(ptcloud):
     fig = plt.figure(figsize=(8, 8))
 
     x, z, y = ptcloud.transpose(1, 0)
-    ax = fig.gca(projection=Axes3D.name, adjustable='box')
+    try:
+        ax = fig.gca(projection=Axes3D.name, adjustable='box')
+    except:
+        ax = fig.add_subplot(projection=Axes3D.name, adjustable='box')
     ax.axis('off')
     # ax.axis('scaled')
     ax.view_init(30, 45)
