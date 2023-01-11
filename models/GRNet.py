@@ -127,7 +127,7 @@ class GRNet(torch.nn.Module):
                         self.gridding_scale,
                         self.gridding_alpha)
 
-    def get_loss(self, ret, gt):
+    def get_loss(self, ret, gt, epoch=0):
         loss_coarse = self.loss_func_1(ret[0], gt) + self.loss_func_2(ret[0], gt) * self.loss_lambda
         loss_fine = self.loss_func_1(ret[1], gt)
         return loss_coarse, loss_fine

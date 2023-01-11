@@ -13,6 +13,8 @@ PoinTr is a transformer-based model for point cloud completion.  By representing
 ![intro](fig/pointr.gif)
 
 ## 🔥News
+- **2023-1-11** Release **AdaPoinTr** (PoinTr + Adaptive Denoising Queries), achieving SOTA performance on various benchmarks. Arxiv is coming soon.
+- **2022-06-01** Implement [SnowFlakeNet](https://arxiv.org/abs/2108.04444).
 - **2021-10-07** Our solution based on PoinTr wins the ***Championship*** on [MVP Completion Challenge (ICCV Workshop 2021)](https://mvp-dataset.github.io/MVP/Completion.html). The code will come soon.
 - **2021-09-09** Fix a bug in `datasets/PCNDataset.py`[(#27)](https://github.com/hzxie/GRNet/pull/27), and update the performance of PoinTr on PCN benchmark (CD from 8.38 to ***7.26***).
 
@@ -27,6 +29,12 @@ We provide pretrained PoinTr models:
 | PCN_new |  [[Tsinghua Cloud](https://cloud.tsinghua.edu.cn/f/444d34a062354c6ead68/?dl=1)] / [[Google Drive](https://drive.google.com/file/d/1qKhPKNf6o0jWnki5d0MGXQtBbgBSDIYo/view?usp=sharing)]  / [[BaiDuYun](https://pan.baidu.com/s/1RHsGXABzz7rbcq4syhg1hA)] (code:aru3 ) |CD = 7.26e-3|
 | KITTI | [[Tsinghua Cloud](https://cloud.tsinghua.edu.cn/f/734011f0b3574ab58cff/?dl=1)] / [[Google Drive](https://drive.google.com/file/d/1oPwXplvn9mR0dI9V7Xjw4RhGwrnBU4dg/view?usp=sharing)]  / [[BaiDuYun](https://pan.baidu.com/s/11FZsE7c0em2SxGVUIRYzyg)] (code:99om) | MMD = 5.04e-4 |
 
+We provide pretrained AdaPoinTr models (coming soon):
+| dataset  | url| performance |
+| --- | --- |  --- |
+| ShapeNet-55 | [[Tsinghua Cloud](https://cloud.tsinghua.edu.cn/f/e73573ca08574e51a714/?dl=1)] / Google Drive / [[BaiDuYun](https://pan.baidu.com/s/17EWcJJHRNpy9B2QmqPm4gQ?pwd=dtt7)](code:dtt7)  | CD = 0.81e-3|
+| ShapeNet-34 | [[Tsinghua Cloud](https://cloud.tsinghua.edu.cn/f/bd77f0b1b1a740108e74/?dl=1)] / Google Drive / [[BaiDuYun](https://pan.baidu.com/s/1tPyFzFBeQj7S3jiKOmLSLQ?pwd=srm5)](code:srm5) | CD = 1.23e-3| 
+| PCN |  [[Tsinghua Cloud](https://cloud.tsinghua.edu.cn/f/b822a5979762417ba75e/?dl=1)] / Google Drive  / [[BaiDuYun](https://pan.baidu.com/s/1KWccgcKXVIdVo4wJAmZ_8w?pwd=rc7p)](code:rc7p)  | CD = 6.53e-3|
 ## Usage
 
 ### Requirements

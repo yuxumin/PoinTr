@@ -1,0 +1,7 @@
+NAME: Projected_ShapeNet
+N_POINTS: 8192
+N_RENDERINGS: 16
+DATA_PATH: data/ShapeNet55-34/Projected_ShapeNet-Unseen21_noise
+PARTIAL_POINTS_PATH: data/ShapeNet55-34/projected_partial_noise/%s/%s/models/%d.pcd
+COMPLETE_POINTS_ROOT: data/ShapeNet55-34/
+CARS: FALSE

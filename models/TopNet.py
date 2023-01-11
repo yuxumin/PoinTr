@@ -64,7 +64,7 @@ class TopNet(nn.Module):
     def build_loss_func(self):
         self.loss_func = ChamferDistanceL2()
 
-    def get_loss(self, ret, gt):
+    def get_loss(self, ret, gt, epoch=0):
         loss_coarse = self.loss_func(ret[0], gt)
         loss_fine = self.loss_func(ret[1], gt)
         return loss_coarse, loss_fine

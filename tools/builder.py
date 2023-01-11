@@ -3,6 +3,7 @@ import os, sys
 import torch
 # optimizer
 import torch.optim as optim
+from timm.scheduler import CosineLRScheduler
 # dataloader
 from datasets import build_dataset_from_cfg
 from models import build_model_from_cfg
@@ -36,11 +37,25 @@ def model_builder(config):
 def build_opti_sche(base_model, config):
     opti_config = config.optimizer
     if opti_config.type == 'AdamW':
-        optimizer = optim.AdamW(base_model.parameters(), **opti_config.kwargs)
+        def add_weight_decay(model, weight_decay=1e-5, skip_list=()):
+            decay = []
+            no_decay = []
+            for name, param in model.module.named_parameters():
+                if not param.requires_grad:
+                    continue  # frozen weights
+                if len(param.shape) == 1 or name.endswith(".bias") or name in skip_list:
+                    no_decay.append(param)
+                else:
+                    decay.append(param)
+            return [
+                {'params': no_decay, 'weight_decay': 0.},
+                {'params': decay, 'weight_decay': weight_decay}]
+        param_groups = add_weight_decay(base_model, weight_decay=opti_config.kwargs.weight_decay)
+        optimizer = optim.AdamW(param_groups, **opti_config.kwargs)
     elif opti_config.type == 'Adam':
-        optimizer = optim.Adam(base_model.parameters(), **opti_config.kwargs)
+        optimizer = optim.Adam(filter(lambda p: p.requires_grad, base_model.parameters()), **opti_config.kwargs)
     elif opti_config.type == 'SGD':
-        optimizer = optim.SGD(base_model.parameters(), nesterov=True, **opti_config.kwargs)
+        optimizer = optim.SGD(filter(lambda p: p.requires_grad, base_model.parameters()), **opti_config.kwargs)
     else:
         raise NotImplementedError()
 
@@ -49,6 +64,15 @@ def build_opti_sche(base_model, config):
         scheduler = build_lambda_sche(optimizer, sche_config.kwargs)  # misc.py
     elif sche_config.type == 'StepLR':
         scheduler = torch.optim.lr_scheduler.StepLR(optimizer, **sche_config.kwargs)
+    elif sche_config.type == 'GradualWarmup':
+        scheduler_steplr = torch.optim.lr_scheduler.StepLR(optimizer, **sche_config.kwargs_1)
+        scheduler = GradualWarmupScheduler(optimizer, after_scheduler=scheduler_steplr, **sche_config.kwargs_2)
+    elif sche_config.type == 'CosLR':
+        scheduler = CosineLRScheduler(optimizer,
+                t_initial=sche_config.kwargs.t_max,
+                lr_min=sche_config.kwargs.min_lr,
+                warmup_t=sche_config.kwargs.initial_epochs,
+                t_in_epochs=True)
     else:
         raise NotImplementedError()
     

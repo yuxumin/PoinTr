@@ -7,9 +7,10 @@
 
 import logging
 import open3d
-
+import torch
 from extensions.chamfer_dist import ChamferDistanceL1, ChamferDistanceL2
-
+import os
+from extensions.emd import emd_module as emd
 
 class Metrics(object):
     ITEMS = [{
@@ -32,15 +33,25 @@ class Metrics(object):
         'eval_object': ChamferDistanceL2(ignore_zeros=True),
         'is_greater_better': False,
         'init_value': 32767
+    }, {
+        'name': 'EMDistance',
+        'enabled': True,
+        'eval_func': 'cls._get_emd_distance',
+        'eval_object': emd.emdModule(),
+        'is_greater_better': False,
+        'init_value': 32767
     }]
 
     @classmethod
-    def get(cls, pred, gt):
+    def get(cls, pred, gt, require_emd=False):
         _items = cls.items()
         _values = [0] * len(_items)
         for i, item in enumerate(_items):
-            eval_func = eval(item['eval_func'])
-            _values[i] = eval_func(pred, gt)
+            if not require_emd and 'emd' in item['eval_func']:
+                _values[i] = torch.tensor(0.).to(gt.device)
+            else:
+                eval_func = eval(item['eval_func'])
+                _values[i] = eval_func(pred, gt)
 
         return _values
 
@@ -58,6 +69,7 @@ class Metrics(object):
 
         """References: https://github.com/lmb-freiburg/what3d/blob/master/util.py"""
         b = pred.size(0)
+        device = pred.device
         assert pred.size(0) == gt.size(0)
         if b != 1:
             f_score_list = []
@@ -73,7 +85,9 @@ class Metrics(object):
 
             recall = float(sum(d < th for d in dist2)) / float(len(dist2))
             precision = float(sum(d < th for d in dist1)) / float(len(dist1))
-            return 2 * recall * precision / (recall + precision) if recall + precision else 0
+            result = 2 * recall * precision / (recall + precision) if recall + precision else 0.
+            result_tensor = torch.tensor(result).to(device)
+            return result_tensor
 
     @classmethod
     def _get_open3d_ptcloud(cls, tensor):
@@ -87,12 +101,19 @@ class Metrics(object):
     @classmethod
     def _get_chamfer_distancel1(cls, pred, gt):
         chamfer_distance = cls.ITEMS[1]['eval_object']
-        return chamfer_distance(pred, gt).item() * 1000
+        return chamfer_distance(pred, gt) * 1000
 
     @classmethod
     def _get_chamfer_distancel2(cls, pred, gt):
         chamfer_distance = cls.ITEMS[2]['eval_object']
-        return chamfer_distance(pred, gt).item() * 1000
+        return chamfer_distance(pred, gt) * 1000
+
+    @classmethod
+    def _get_emd_distance(cls, pred, gt, eps=0.005, iterations=100):
+        emd_loss = cls.ITEMS[3]['eval_object']
+        dist, _ = emd_loss(pred, gt, eps, iterations)
+        emd_out = torch.mean(torch.sqrt(dist))
+        return emd_out * 1000
 
     def __init__(self, metric_name, values):
         self._items = Metrics.items()

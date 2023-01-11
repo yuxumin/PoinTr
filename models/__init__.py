@@ -4,3 +4,5 @@ import models.PoinTr
 import models.GRNet
 import models.PCN
 import models.FoldingNet
+import models.SnowFlakeNet
+import models.AdaPoinTr

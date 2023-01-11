@@ -1,0 +1,6 @@
+NAME: Completion3D
+CATEGORY_FILE_PATH: data/Completion3D/Completion3D.json
+N_POINTS: 2048
+PARTIAL_POINTS_PATH: data/Completion3D/%s/partial/%s/%s.h5
+COMPLETE_POINTS_PATH: data/Completion3D/%s/gt/%s/%s.h5
+CARS: FALSE

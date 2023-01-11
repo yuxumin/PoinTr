@@ -1,0 +1,42 @@
+optimizer : {
+  type: Adam,
+  kwargs: {
+  lr : 0.001, 
+  weight_decay : 0
+}}
+
+
+scheduler: {
+  type: GradualWarmup,
+  kwargs_1: {
+    step_size: 50,
+    gamma : 0.5
+  },
+  kwargs_2: {
+    multiplier: 1,
+    total_epoch: 200,
+  }
+}
+
+
+dataset : { # note that, snowflake use different input transform (RandomSample -> UpSample)
+  train : { _base_: cfgs/dataset_configs/PCNv2.yaml, 
+            others: {subset: 'train'}},
+  val : { _base_: cfgs/dataset_configs/PCNv2.yaml, 
+            others: {subset: 'test'}},
+  test : { _base_: cfgs/dataset_configs/PCNv2.yaml, 
+            others: {subset: 'test'}}}
+            
+model : {
+  NAME: SnowFlakeNet, 
+  dim_feat: 512, 
+  num_pc: 256, 
+  num_p0: 512, 
+  radius: 1, 
+  up_factors: [4, 8]
+  }
+total_bs : 64
+step_per_update: 1
+max_epoch : 300
+
+consider_metric: CDL1

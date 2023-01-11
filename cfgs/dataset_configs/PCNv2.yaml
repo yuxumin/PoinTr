@@ -1,0 +1,7 @@
+NAME: PCNv2
+CATEGORY_FILE_PATH: data/PCN/PCN.json
+N_POINTS: 16384
+N_RENDERINGS: 8
+PARTIAL_POINTS_PATH: data/PCN/%s/partial/%s/%s/%02d.pcd
+COMPLETE_POINTS_PATH: data/PCN/%s/complete/%s/%s.pcd
+CARS: FALSE

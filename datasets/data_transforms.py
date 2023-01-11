@@ -66,6 +66,26 @@ class RandomSamplePoints(object):
 
         return ptcloud
 
+class UpSamplePoints(object):
+    def __init__(self, parameters):
+        self.n_points = parameters['n_points']
+
+    def __call__(self, ptcloud):
+        curr = ptcloud.shape[0]
+        need = self.n_points - curr
+
+        if need < 0:
+            return ptcloud[np.random.permutation(self.n_points)]
+
+        while curr <= need:
+            ptcloud = np.tile(ptcloud, (2, 1))
+            need -= curr
+            curr *= 2
+
+        choice = np.random.permutation(need)
+        ptcloud = np.concatenate((ptcloud, ptcloud[choice]))
+
+        return ptcloud
 
 class RandomMirrorPoints(object):
     def __init__(self, parameters):
