@@ -13,7 +13,7 @@ PoinTr is a transformer-based model for point cloud completion.  By representing
 ![intro](fig/pointr.gif)
 
 ## 🔥News
-- **2023-1-11** Release **AdaPoinTr** (PoinTr + Adaptive Denoising Queries), achieving SOTA performance on various benchmarks. Arxiv is coming soon.
+- **2023-1-11** Release **AdaPoinTr** (PoinTr + Adaptive Denoising Queries), achieving SOTA performance on various benchmarks. [Arxiv](https://arxiv.org/abs/2301.04545).
 - **2022-06-01** Implement [SnowFlakeNet](https://arxiv.org/abs/2108.04444).
 - **2021-10-07** Our solution based on PoinTr wins the ***Championship*** on [MVP Completion Challenge (ICCV Workshop 2021)](https://mvp-dataset.github.io/MVP/Completion.html). The code will come soon.
 - **2021-09-09** Fix a bug in `datasets/PCNDataset.py`[(#27)](https://github.com/hzxie/GRNet/pull/27), and update the performance of PoinTr on PCN benchmark (CD from 8.38 to ***7.26***).
@@ -34,7 +34,7 @@ We provide pretrained AdaPoinTr models (coming soon):
 | --- | --- |  --- |
 | ShapeNet-55 | Tsinghua Cloud / Google Drive / BaiDuYun  | CD = 0.81e-3|
 | ShapeNet-34 | Tsinghua Cloud / Google Drive / BaiDuYun | CD = 1.23e-3| 
-| PCN |  [[Tsinghua Cloud](https://cloud.tsinghua.edu.cn/f/b822a5979762417ba75e/?dl=1)] / Google Drive  / [[BaiDuYun](https://pan.baidu.com/s/1KWccgcKXVIdVo4wJAmZ_8w?pwd=rc7p)](code:rc7p)  | CD = 6.53e-3|
+| PCN |  [[Tsinghua Cloud](https://cloud.tsinghua.edu.cn/f/b822a5979762417ba75e/?dl=1)] / [[Google Drive](https://drive.google.com/file/d/17pE2U2T2k4w1KfmDbL6U-GkEwD-duTaF/view?usp=share_link)]  / [[BaiDuYun](https://pan.baidu.com/s/1KWccgcKXVIdVo4wJAmZ_8w?pwd=rc7p)](code:rc7p)  | CD = 6.53e-3|
 ## Usage
 
 ### Requirements
