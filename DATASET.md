@@ -2,7 +2,7 @@
 
 ### ShapNet55/34
 
-We propose two more challenging benchmarks ShapeNet-55 and ShapeNet-34 with more diverse incomplete point clouds that can better reflect the real-world scenarios to promote future research. Our dataset is based on [ShapeNetCore](https://shapenet.org/). Compared to existing datasets like PCN, ShapeNet-55 considers more diverse tasks (i.e., upsampling and completion of point cloud), more diverse categories (i.e., from 8 categories to 55 categories), more diverse viewpoints (i.e., from 8 viewpoints to all possible viewpoints) and more diverse levels of incompleteness (i.e., missing 25% to 75% points of the groundtruth point clouds). We also propose to benchmark the completion perfomance on objects from unseen categories with ShapeNet-34.  
+We propose two more challenging benchmarks ShapeNet-55 and ShapeNet-34 with more diverse incomplete point clouds that can better reflect the real-world scenarios to promote future research. Our dataset is based on [ShapeNetCore](https://shapenet.org/). Compared to existing datasets like PCN, ShapeNet-55 considers more diverse tasks (i.e., upsampling and completion of point cloud), more diverse categories (i.e., from 8 categories to 55 categories), more diverse viewpoints (i.e., from 8 viewpoints to all possible viewpoints) and more diverse levels of incompleteness (i.e., missing 25% to 75% points of the groundtruth point clouds). We also propose to benchmark the completion performance on objects from unseen categories with ShapeNet-34.  
 
 ![dataset](fig/dataset.png)
 
