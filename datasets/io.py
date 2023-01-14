@@ -10,7 +10,7 @@ class IO:
 
         if file_extension in ['.npy']:
             return cls._read_npy(file_path)
-        elif file_extension in ['.pcd']:
+        elif file_extension in ['.pcd', '.ply']:
             return cls._read_pcd(file_path)
         elif file_extension in ['.h5']:
             return cls._read_h5(file_path)

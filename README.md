@@ -73,6 +73,27 @@ pip install --upgrade https://github.com/unlimblue/KNN_CUDA/releases/download/0.
 
 The details of our new ***ShapeNet-55/34*** datasets and other existing datasets can be found in [DATASET.md](./DATASET.md).
 
+### Inference
+
+To inference sample(s) with pretrain model
+
+```
+python tools/inference.py \
+${POINTR_CONFIG_FILE} ${POINTR_CHECKPOINT_FILE} \
+[--pc_root <path> or --pc <file>] \
+[--save_vis_img] \
+[--out_pc_root <dir>] \
+```
+
+For example, inference all samples under `demo/` and save the result under `inference_result/`
+```
+python tools/inference.py \
+cfgs/PCN_models/AdaPoinTr.yaml ckpts/AdaPoinTr_PCN.pth \
+--pc_root demo/ \ 
+--save_vis_img  \
+--out_pc_root inference_result/ \
+```
+
 ### Evaluation
 
 To evaluate a pre-trained PoinTr model on the Three Dataset with single GPU, run:
