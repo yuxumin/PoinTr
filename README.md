@@ -75,7 +75,7 @@ The details of our new ***ShapeNet-55/34*** datasets and other existing datasets
 
 ### Inference
 
-To inference sample(s) with pretrain model
+To inference sample(s) with pretrained model
 
 ```
 python tools/inference.py \
@@ -85,7 +85,7 @@ ${POINTR_CONFIG_FILE} ${POINTR_CHECKPOINT_FILE} \
 [--out_pc_root <dir>] \
 ```
 
-For example, inference all samples under `demo/` and save the result under `inference_result/`
+For example, inference all samples under `demo/` and save the results under `inference_result/`
 ```
 python tools/inference.py \
 cfgs/PCN_models/AdaPoinTr.yaml ckpts/AdaPoinTr_PCN.pth \
