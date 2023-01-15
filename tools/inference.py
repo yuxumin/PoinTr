@@ -49,44 +49,52 @@ def get_args():
 
     return args
 
-def inference_single(model, pc_path, args, root=None):
+def inference_single(model, pc_path, args, config, root=None):
     if root is not None:
         pc_file = os.path.join(root, pc_path)
     else:
         pc_file = pc_path
     # read single point cloud
     pc_ndarray = IO.get(pc_file).astype(np.float32)
-    # transform it according to the model (TODO: support auto transform by config)
-    transform = Compose([
-        {
-            'callback': 'UpSamplePoints',
-            'parameters': {
-                'n_points': 2048
-            },
-            'objects': ['input']
-        }, {
-            'callback': 'ToTensor',
-            'objects': ['input']
-        }])
+    # transform it according to the model 
+    if config.dataset.train._base_['NAME'] == 'ShapeNet':
+        # normalize it to fit the model on ShapeNet-55/34
+        centroid = np.mean(pc_ndarray, axis=0)
+        pc_ndarray = pc_ndarray - centroid
+        m = np.max(np.sqrt(np.sum(pc_ndarray**2, axis=1)))
+        pc_ndarray = pc_ndarray / m
+
+    transform = Compose([{
+        'callback': 'UpSamplePoints',
+        'parameters': {
+            'n_points': 2048
+        },
+        'objects': ['input']
+    }, {
+        'callback': 'ToTensor',
+        'objects': ['input']
+    }])
+    
     pc_ndarray_normalized = transform({'input': pc_ndarray})
     # inference
     ret = model(pc_ndarray_normalized['input'].unsqueeze(0).to(args.device.lower()))
-    coarse_points = ret[0].squeeze(0).detach().cpu().numpy()
     dense_points = ret[-1].squeeze(0).detach().cpu().numpy()
+
+    if config.dataset.train._base_['NAME'] == 'ShapeNet':
+        # denormalize it to adapt for the original input
+        dense_points = dense_points * m
+        dense_points = dense_points + centroid
 
     if args.out_pc_root != '':
         target_path = os.path.join(args.out_pc_root, os.path.splitext(pc_path)[0])
         os.makedirs(target_path, exist_ok=True)
 
-        np.save(os.path.join(target_path, 'fine.npy'), coarse_points)
-        np.save(os.path.join(target_path, 'coarse.npy'), dense_points)
+        np.save(os.path.join(target_path, 'fine.npy'), dense_points)
         if args.save_vis_img:
-            input_img = misc.get_ptcloud_img(pc_ndarray)
+            input_img = misc.get_ptcloud_img(pc_ndarray_normalized['input'].numpy())
             dense_img = misc.get_ptcloud_img(dense_points)
-            coarse_img = misc.get_ptcloud_img(coarse_points)
             cv2.imwrite(os.path.join(target_path, 'input.jpg'), input_img)
             cv2.imwrite(os.path.join(target_path, 'fine.jpg'), dense_img)
-            cv2.imwrite(os.path.join(target_path, 'coarse.jpg'), coarse_img)
     
     return
 
@@ -104,9 +112,9 @@ def main():
     if args.pc_root != '':
         pc_file_list = os.listdir(args.pc_root)
         for pc_file in pc_file_list:
-            inference_single(base_model, pc_file, args, root=args.pc_root)
+            inference_single(base_model, pc_file, args, config, root=args.pc_root)
     else:
-        inference_single(base_model, args.pc, args)
+        inference_single(base_model, args.pc, args, config)
 
 if __name__ == '__main__':
     main()
