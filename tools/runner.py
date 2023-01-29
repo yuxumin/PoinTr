@@ -61,7 +61,7 @@ def run_net(args, config, train_writer=None, val_writer=None):
         print_log('Using Data parallel ...' , logger = logger)
         base_model = nn.DataParallel(base_model).cuda()
     # optimizer & scheduler
-    optimizer, scheduler = builder.build_opti_sche(base_model, config)
+    optimizer = builder.build_optimizer(base_model, config)
     
     # Criterion
     ChamferDisL1 = ChamferDistanceL1()
@@ -70,6 +70,7 @@ def run_net(args, config, train_writer=None, val_writer=None):
 
     if args.resume:
         builder.resume_optimizer(optimizer, args, logger = logger)
+    scheduler = builder.build_scheduler(base_model, optimizer, config, last_epoch=start_epoch-1)
 
     # trainval
     # training

@@ -42,20 +42,20 @@ def fps(data, number):
 def worker_init_fn(worker_id):
     np.random.seed(np.random.get_state()[1][0] + worker_id)
 
-def build_lambda_sche(opti, config):
+def build_lambda_sche(opti, config, last_epoch=-1):
     if config.get('decay_step') is not None:
         # lr_lbmd = lambda e: max(config.lr_decay ** (e / config.decay_step), config.lowest_decay)
         warming_up_t = getattr(config, 'warmingup_e', 0)
         lr_lbmd = lambda e: max(config.lr_decay ** ((e - warming_up_t) / config.decay_step), config.lowest_decay) if e >= warming_up_t else max(e / warming_up_t, 0.001)
-        scheduler = torch.optim.lr_scheduler.LambdaLR(opti, lr_lbmd)
+        scheduler = torch.optim.lr_scheduler.LambdaLR(opti, lr_lbmd, last_epoch=last_epoch)
     else:
         raise NotImplementedError()
     return scheduler
 
-def build_lambda_bnsche(model, config):
+def build_lambda_bnsche(model, config, last_epoch=-1):
     if config.get('decay_step') is not None:
         bnm_lmbd = lambda e: max(config.bn_momentum * config.bn_decay ** (e / config.decay_step), config.lowest_decay)
-        bnm_scheduler = BNMomentumScheduler(model, bnm_lmbd)
+        bnm_scheduler = BNMomentumScheduler(model, bnm_lmbd, last_epoch=last_epoch)
     else:
         raise NotImplementedError()
     return bnm_scheduler

@@ -34,7 +34,7 @@ def model_builder(config):
     model = build_model_from_cfg(config)
     return model
 
-def build_opti_sche(base_model, config):
+def build_optimizer(base_model, config):
     opti_config = config.optimizer
     if opti_config.type == 'AdamW':
         def add_weight_decay(model, weight_decay=1e-5, skip_list=()):
@@ -59,13 +59,16 @@ def build_opti_sche(base_model, config):
     else:
         raise NotImplementedError()
 
+    return optimizer
+
+def build_scheduler(base_model, optimizer, config, last_epoch=-1):
     sche_config = config.scheduler
     if sche_config.type == 'LambdaLR':
-        scheduler = build_lambda_sche(optimizer, sche_config.kwargs)  # misc.py
+        scheduler = build_lambda_sche(optimizer, sche_config.kwargs, last_epoch=last_epoch)  # misc.py
     elif sche_config.type == 'StepLR':
-        scheduler = torch.optim.lr_scheduler.StepLR(optimizer, **sche_config.kwargs)
+        scheduler = torch.optim.lr_scheduler.StepLR(optimizer, last_epoch=last_epoch, **sche_config.kwargs)
     elif sche_config.type == 'GradualWarmup':
-        scheduler_steplr = torch.optim.lr_scheduler.StepLR(optimizer, **sche_config.kwargs_1)
+        scheduler_steplr = torch.optim.lr_scheduler.StepLR(optimizer, last_epoch=last_epoch, **sche_config.kwargs_1)
         scheduler = GradualWarmupScheduler(optimizer, after_scheduler=scheduler_steplr, **sche_config.kwargs_2)
     elif sche_config.type == 'CosLR':
         scheduler = CosineLRScheduler(optimizer,
@@ -82,7 +85,7 @@ def build_opti_sche(base_model, config):
             bnscheduler = build_lambda_bnsche(base_model, bnsche_config.kwargs)  # misc.py
         scheduler = [scheduler, bnscheduler]
     
-    return optimizer, scheduler
+    return scheduler
 
 def resume_model(base_model, args, logger = None):
     ckpt_path = os.path.join(args.experiment_path, 'ckpt-last.pth')
