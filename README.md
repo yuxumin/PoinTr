@@ -13,6 +13,7 @@ PoinTr is a transformer-based model for point cloud completion.  By representing
 ![intro](fig/pointr.gif)
 
 ## 🔥News
+- **2023-9-2** **AdaPoinTr** accepted by T-PAMI, Projected-ShapeNet dataset see [here](./DATASET.md)
 - **2023-1-11** Release **AdaPoinTr** (PoinTr + Adaptive Denoising Queries), achieving SOTA performance on various benchmarks. [Arxiv](https://arxiv.org/abs/2301.04545).
 - **2022-06-01** Implement [SnowFlakeNet](https://arxiv.org/abs/2108.04444).
 - **2021-10-07** Our solution based on PoinTr wins the ***Championship*** on [MVP Completion Challenge (ICCV Workshop 2021)](https://mvp-dataset.github.io/MVP/Completion.html). The code will come soon.
