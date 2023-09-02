@@ -20,10 +20,16 @@ The overall directory structure should be:
 │   ├──KITTI/
 ├──.......
 ```
-**ShapeNet55/34 Dataset**: You can download the processed ShapeNet55/34 dataset at [[BaiduCloud](https://pan.baidu.com/s/16Q-GsEXEHkXRhmcSZTY86A)] (code:le04) or [[Google Drive](https://drive.google.com/file/d/1jUB5yD7DP97-EqqU2A9mmr61JpNwZBVK/view?usp=sharing)]. Unzip the file under `ShapeNet55-34/`. The directory structure should be
+**ShapeNet55/34 Dataset and Projected-ShapeNet55/34**: You can download the processed ShapeNet55/34 dataset at [[BaiduCloud](https://pan.baidu.com/s/16Q-GsEXEHkXRhmcSZTY86A)] (code:le04) or [[Google Drive](https://drive.google.com/file/d/1jUB5yD7DP97-EqqU2A9mmr61JpNwZBVK/view?usp=sharing)], Unzip the file under `ShapeNet55-34/`.
 
+You can download the processed Projected-ShapeNet55/34 dataset at [[BaiduCloud](https://pan.baidu.com/s/14ei-HClbLr_5-xAG-00BHg?pwd=dycc)(code:dycc), unzip the file under `ShapeNet55-34/`, `cat project_shapenet_pcd.tar* | tar xvf`.
+The directory structure should be:
 ```
 │ShapeNet55-34/
+├──projected_partial_noise/
+│  ├── 02691156
+│  ├── 02818832
+│  ├── .......
 ├──shapenet_pc/
 │  ├── 02691156-1a04e3eab45ca15dd86060f189eb133.npy
 │  ├── 02691156-1a6ad7a24bb89733f412783097373bdc.npy
@@ -35,6 +41,14 @@ The overall directory structure should be:
 │  ├── train.txt
 │  └── test.txt
 ├──ShapeNet-Unseen21/
+│   └── test.txt
+├──Projected_ShapeNet-34_noise/
+│  ├── train.txt
+│  └── test.txt
+├──Projected_ShapeNet-55_noise/
+│  ├── train.txt
+│  └── test.txt
+├──Projected_ShapeNet-Unseen21_noise/
    └── test.txt
 ```
 
