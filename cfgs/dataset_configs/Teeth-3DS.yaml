@@ -1,0 +1,4 @@
+NAME: ShapeNet
+DATA_PATH: data/Teeth-3DS/Teeth3DS-splits
+N_POINTS: 8192
+PC_PATH: data/Teeth-3DS/Teeth-3DS_data_npy

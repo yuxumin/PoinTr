@@ -1,0 +1,36 @@
+optimizer : {
+  type: AdamW,
+  kwargs: {
+  lr : 0.0005, 
+  weight_decay : 0.0005
+}}
+scheduler: {
+  type: LambdaLR,
+  kwargs: {
+  decay_step: 21,
+  lr_decay: 0.76,
+  lowest_decay: 0.02  # min lr = lowest_decay * lr
+}}
+bnmscheduler: {
+  type: Lambda,
+  kwargs: {
+  decay_step: 21,
+  bn_decay: 0.5,
+  bn_momentum: 0.9,
+  lowest_decay: 0.01
+}}
+
+dataset : {
+  train : { _base_: cfgs/dataset_configs/Teeth-3DS.yaml, 
+            others: {subset: 'train'}},
+  val : { _base_: cfgs/dataset_configs/Teeth-3DS.yaml, 
+            others: {subset: 'test'}},
+  test : { _base_: cfgs/dataset_configs/Teeth-3DS.yaml, 
+            others: {subset: 'test'}}}
+model : {
+  NAME: PoinTr, num_pred: 6144, num_query: 96, knn_layer: 1, trans_dim: 384}
+total_bs : 96
+step_per_update : 1
+max_epoch : 200
+
+consider_metric: CDL2

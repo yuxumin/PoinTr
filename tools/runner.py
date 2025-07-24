@@ -9,12 +9,32 @@ from utils.logger import *
 from utils.AverageMeter import AverageMeter
 from utils.metrics import Metrics
 from extensions.chamfer_dist import ChamferDistanceL1, ChamferDistanceL2
+import numpy as np 
+
+import open3d as o3d
 
 def run_net(args, config, train_writer=None, val_writer=None):
     logger = get_logger(args.log_name)
     # build dataset
+
+    print("----"*80)
+    print(args)
+    print("-"*80)
+    print(config.dataset.train)
+    print("----"*80)
+
+
     (train_sampler, train_dataloader), (_, test_dataloader) = builder.dataset_builder(args, config.dataset.train), \
                                                             builder.dataset_builder(args, config.dataset.val)
+    
+
+
+    # print(len(train_sampler))
+    # print(len(train_dataloader))
+    # print(len(test_dataloader))
+
+    
+    
     # build model
     base_model = builder.model_builder(config.model)
     if args.use_gpu:
@@ -394,11 +414,34 @@ def test(base_model, test_dataloader, ChamferDisL1, ChamferDisL2, args, config, 
 
                     _metrics = Metrics.get(dense_points ,gt)
 
+                    pred_points = dense_points[0].cpu().numpy()
+                    gt_points = gt[0].cpu().numpy()
+                    partial_points = partial[0].cpu().numpy()
 
+                    # print(partial_points.shape)
+
+                    np.save(os.path.join("/home/shirshak/PoinTr/zzz_visualizations/", 'input.npy'), dense_points.cpu().numpy())
+                    np.save(os.path.join("/home/shirshak/PoinTr/zzz_visualizations/", 'pred.npy'), gt.cpu().numpy())
+
+                    pcd = o3d.geometry.PointCloud()
+                    pcd.points = o3d.utility.Vector3dVector(gt_points)
+                    # o3d.io.write_point_cloud(os.path.join("/home/shirshak/PoinTr/zzz_visualizations/gt/",f"gt_{idx}.pcd"), pcd)
+                    o3d.io.write_point_cloud(os.path.join("/home/shirshak/PoinTr/zzz_visualizations_teeth3DS/gt/",f"gt_{idx}.pcd"), pcd)
+
+
+                    pcd.points = o3d.utility.Vector3dVector(pred_points)
+                    # o3d.io.write_point_cloud(os.path.join("/home/shirshak/PoinTr/zzz_visualizations/pred/",f"pred_{idx}.pcd"), pcd)
+                    o3d.io.write_point_cloud(os.path.join("/home/shirshak/PoinTr/zzz_visualizations_teeth3DS/pred/",f"pred_{idx}.pcd"), pcd)
+
+                    pcd.points = o3d.utility.Vector3dVector(partial_points)
+                    # o3d.io.write_point_cloud(os.path.join("/home/shirshak/PoinTr/zzz_visualizations/input_partial_2048/",f"input_partial_2048_{idx}.pcd"), pcd)
+                    o3d.io.write_point_cloud(os.path.join("/home/shirshak/PoinTr/zzz_visualizations_teeth3DS/input_partial_2048/",f"input_partial_2048_{idx}.pcd"), pcd)
 
                     if taxonomy_id not in category_metrics:
                         category_metrics[taxonomy_id] = AverageMeter(Metrics.names())
                     category_metrics[taxonomy_id].update(_metrics)
+
+
             elif dataset_name == 'KITTI':
                 partial = data.cuda()
                 ret = base_model(partial)

@@ -66,3 +66,19 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+# bash ./scripts/test.sh 0 \                                                                                 
+#     --ckpts /home/shirshak/PoinTr/experiments/PoinTr/ShapeNet55_models/example/ckpt-best.pth \
+#     --config ./cfgs/ShapeNet55_models/PoinTr.yaml \
+#     --mode easy \
+#     --exp_name example
+
+# bash ./scripts/train.sh 0 \                                                                                
+#     --config ./cfgs/ShapeNet55_models/PoinTr.yaml \
+#     --exp_name example
+
+
+
+# bash ./scripts/train.sh 0 --config ./cfgs/Teeth3DS_models/PoinTr.yaml --exp_name example
+# bash ./scripts/test.sh 0 --ckpts /home/shirshak/PoinTr/experiments/PoinTr/Teeth3DS_models/example/ckpt-best.pth --config ./cfgs/Teeth3DS_models/PoinTr.yaml --mode easy --exp_name example
