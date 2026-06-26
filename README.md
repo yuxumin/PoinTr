@@ -40,7 +40,47 @@ We provide pretrained AdaPoinTr models (coming soon):
 | PCN |  [[Tsinghua Cloud](https://cloud.tsinghua.edu.cn/f/b822a5979762417ba75e/?dl=1)] / [[Google Drive](https://drive.google.com/file/d/17pE2U2T2k4w1KfmDbL6U-GkEwD-duTaF/view?usp=share_link)]  / [[BaiDuYun](https://pan.baidu.com/s/1KWccgcKXVIdVo4wJAmZ_8w?pwd=rc7p)](code:rc7p)  | CD = 6.53e-3|
 ## Usage
 
-### Requirements
+### With conda
+If you're on Windows, move to WSL Ubuntu.
+conda create -n my_env python=3.11
+
+conda activate my_env
+conda install nvidia/label/cuda-12.4.0::cuda-toolkit
+
+```bash
+pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+```
+
+ Check that torch detects your GPU.
+```py
+import torch
+print(f"Number of GPUs available: {torch.cuda.device_count()}")
+print(f"GPU 0 name: {torch.cuda.get_device_name(0)}")
+```
+
+```bash
+pip install "git+https://github.com/facebookresearch/pytorch3d.git"
+
+pip install torch-scatter -f https://data.pyg.org/whl/torch-2.6.0+cu124.html
+
+git clone https://github.com/yuxumin/PoinTr.git
+
+cd PoinTr
+```
+Remove the == and the versions in requirements.txt
+```bash
+pip install -r requirements.txt
+
+pip install extensions/chamfer_dist extensions/cubic_feature_sampling extensions/gridding extensions/gridding_loss
+
+pip install "git+https://github.com/LucasColas/Pointnet2_PyTorch.git#egg=pointnet2_ops&subdirectory=pointnet2_ops_lib"
+
+pip install --upgrade https://github.com/unlimblue/KNN_CUDA/releases/download/0.2/KNN_CUDA-0.2-py3-none-any.whl
+
+```
+
+### Without conda
+## Requirements
 
 - PyTorch >= 1.7.0
 - python >= 3.7
@@ -55,7 +95,7 @@ We provide pretrained AdaPoinTr models (coming soon):
 pip install -r requirements.txt
 ```
 
-#### Building Pytorch Extensions for Chamfer Distance, PointNet++ and kNN
+### Building Pytorch Extensions for Chamfer Distance, PointNet++ and kNN
 
 *NOTE:* PyTorch >= 1.7 and GCC >= 4.9 are required.
 
@@ -63,13 +103,8 @@ pip install -r requirements.txt
 # Chamfer Distance
 bash install.sh
 ```
+
 The solution for a common bug in chamfer distance installation can be found in Issue [#6](https://github.com/yuxumin/PoinTr/issues/6)
-```
-# PointNet++
-pip install "git+https://github.com/erikwijmans/Pointnet2_PyTorch.git#egg=pointnet2_ops&subdirectory=pointnet2_ops_lib"
-# GPU kNN
-pip install --upgrade https://github.com/unlimblue/KNN_CUDA/releases/download/0.2/KNN_CUDA-0.2-py3-none-any.whl
-```
 
 Note: If you still get `ModuleNotFoundError: No module named 'gridding'` or something similar then run these steps
 
