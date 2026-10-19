@@ -6,8 +6,8 @@
  * @Email:  cshzxie@gmail.com
  */
 
-#include <bits/stdc++.h>
 #include <torch/extension.h>
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 
